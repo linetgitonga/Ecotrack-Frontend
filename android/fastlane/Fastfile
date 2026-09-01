@@ -1,0 +1,19 @@
+default_platform(:android)
+
+platform :android do
+  desc "Deploy a new build to the Google Play Internal Track"
+  lane :deploy_to_internal do
+    # Requires service_account.json to be injected by CI
+    gradle(
+      task: "bundle",
+      flavor: "Prod",
+      build_type: "Release"
+    )
+
+    upload_to_play_store(
+      track: 'internal',
+      aab: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
+      json_key: ENV["PLAY_STORE_JSON_KEY_FILE"] # Path to injected JSON file
+    )
+  end
+end

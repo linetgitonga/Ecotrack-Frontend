@@ -1,0 +1,3 @@
+#include "Generated.xcconfig"
+APP_DISPLAY_NAME=EcoTrack Staging
+PRODUCT_BUNDLE_IDENTIFIER=com.example.ecotrack.staging

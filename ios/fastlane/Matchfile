@@ -1,0 +1,7 @@
+git_url("https://github.com/your-org/ios-certificates.git")
+
+storage_mode("git")
+type("appstore")
+
+app_identifier(["com.example.ecotrack"])
+username("apple_developer@example.com") 

@@ -1,0 +1,25 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new build to TestFlight"
+  lane :deploy_to_testflight do
+    # Fetch certs/profiles using Match (requires MATCH_PASSWORD env var in CI)
+    match(
+      type: "appstore",
+      readonly: true,
+      app_identifier: "com.example.ecotrack"
+    )
+
+    # Build the app using the 'prod' scheme
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "prod",
+      export_method: "app-store"
+    )
+
+    # Upload to TestFlight (requires APP_STORE_CONNECT_API_KEY env vars in CI)
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

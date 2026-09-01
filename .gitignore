@@ -1,0 +1,28 @@
+# Flutter/Dart/Pub
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+
+# Secrets & Environments
+.env*
+*.jks
+*.keystore
+key.properties
+service_account.json
+android-fastlane-json-key.json
+
+# iOS & Fastlane artifacts
+ios/Pods/
+.symlinks/
+*.ipa
+*.dSYM.zip
+*.mobileprovision
+*.cer
+
+# Fastlane specific
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots/**/*.png
+*/fastlane/test_output

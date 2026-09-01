@@ -1,0 +1,69 @@
+name: Deploy Mobile Apps (DevOps Pipeline)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Triggers on version tags e.g. v1.0.0
+
+jobs:
+  build_and_deploy:
+    name: Build & Deploy Android & iOS
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x' # Specify your stable version
+          channel: 'stable'
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Run Tests
+        run: flutter test
+
+      - name: Setup Dotenv (Prod)
+        run: echo "${{ secrets.ENV_PROD }}" > .env.prod
+
+      # ==========================================
+      # ANDROID DEPLOYMENT
+      # ==========================================
+      - name: Decode Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+          echo "storeFile=upload-keystore.jks" > android/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+
+      - name: Decode Play Store JSON Key
+        run: echo "${{ secrets.PLAY_STORE_JSON_KEY_BASE64 }}" | base64 --decode > android/service_account.json
+
+      - name: Deploy Android to Internal Track
+        working-directory: android
+        env:
+          PLAY_STORE_JSON_KEY_FILE: "service_account.json"
+        run: bundle exec fastlane deploy_to_internal
+
+      # ==========================================
+      # IOS DEPLOYMENT
+      # ==========================================
+      - name: Deploy iOS to TestFlight
+        working-directory: ios
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_P8_KEY_BASE64 }} # Fastlane can decode base64 keys natively or you can decode it to a file
+        run: bundle exec fastlane deploy_to_testflight
