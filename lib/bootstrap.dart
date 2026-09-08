@@ -5,6 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'app/app.dart';
 import 'core/config/env_config.dart';
+import 'core/connectivity/connection_manager.dart';
+import 'core/sync/sync_engine.dart';
 import 'injection/injection.dart';
 
 /// Per-environment dotenv asset filename.
@@ -56,6 +58,10 @@ Future<void> bootstrap(Environment environment) async {
   );
 
   await configureDependencies(config);
+
+  // Start the connection state machine + sync engine (non-blocking).
+  unawaited(getIt<ConnectionManager>().start());
+  getIt<SyncEngine>().start();
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
