@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
@@ -106,7 +107,13 @@ abstract final class MockFixtures {
 
   static bool handles(RequestOptions o) {
     final p = o.path;
-    return p.contains('/devices') ||
+    return p.contains('/auth/') ||
+        p == '/me' ||
+        p == '/sites' ||
+        RegExp(r'^/sites/[^/]+$').hasMatch(p) ||
+        RegExp(r'^/sites/[^/]+/members$').hasMatch(p) ||
+        p == '/audit-log' ||
+        p.contains('/devices') ||
         p.contains('/telemetry') ||
         p.contains('/costs') ||
         p.contains('/insights') ||
@@ -129,6 +136,136 @@ abstract final class MockFixtures {
   static (int, Object)? respond(RequestOptions o, Random rng) {
     final p = o.path;
     final m = o.method.toUpperCase();
+
+    // --- Auth (demo — no backend) ---------------------------------
+    if (p.endsWith('/auth/otp/request')) {
+      final phone = (o.data is Map) ? '${(o.data as Map)['phone_e164']}' : '';
+      return (
+        200,
+        {
+          'pending_token': 'demo-pt',
+          'method': 'sms',
+          'masked_target': phone.isEmpty
+              ? '+2547•••••678'
+              : '${phone.substring(0, phone.length - 6)}•••${phone.substring(phone.length - 3)}',
+          'expires_in': 300,
+        },
+      );
+    }
+    if (p.endsWith('/auth/otp/resend')) {
+      return (200, {'detail': 'A new code has been sent.'});
+    }
+    if (p.endsWith('/auth/otp/verify') || p.endsWith('/auth/refresh')) {
+      return (
+        200,
+        {'access': _jwt(minutes: 15), 'refresh': _jwt(minutes: 43200)},
+      );
+    }
+    if (p.endsWith('/auth/logout')) return (205, {});
+    if (p.endsWith('/auth/sessions/revoke-all')) return (200, {'revoked': 1});
+    if (p.contains('/auth/sessions') && m == 'DELETE') return (204, {});
+    if (p.endsWith('/auth/sessions')) {
+      return (
+        200,
+        [
+          {
+            'session_id': 'sess-1',
+            'device_name': 'This browser',
+            'ip_address': '197.232.0.1',
+            'login_at': _hoursAgo(2),
+            'last_activity': _hoursAgo(0),
+            'expires_at': _daysAhead(30),
+            'is_current': true,
+          },
+        ],
+      );
+    }
+    if (p.endsWith('/auth/step-up/initiate')) {
+      return (200, {'pending_token': 'demo-su', 'expires_in': 300});
+    }
+    if (p.endsWith('/auth/step-up/verify')) return (200, {'ok': true});
+
+    if (p == '/me') {
+      return (
+        200,
+        {
+          'id': 'user-demo',
+          'tenant': 'tenant-demo',
+          'phone_e164': '+254712345678',
+          'email': null,
+          'display_name': 'Demo User',
+          'role': 'owner',
+          'locale': 'en-KE',
+          'status': 'active',
+          'created_at': _daysAhead(-120),
+          'last_login_at': _hoursAgo(0),
+        },
+      );
+    }
+    if (p == '/sites' && m == 'GET') {
+      return (200, [_site('site-demo', 'My Home'), _site('site-shop', 'Shop')]);
+    }
+    if (p == '/sites' && m == 'POST') {
+      final label = (o.data is Map)
+          ? '${(o.data as Map)['label']}'
+          : 'New site';
+      return (201, _site('site-${rng.nextInt(9999)}', label));
+    }
+    if (RegExp(r'^/sites/[^/]+$').hasMatch(p)) {
+      return (200, _site(p.split('/').last, 'Site'));
+    }
+    if (RegExp(r'^/sites/[^/]+/members$').hasMatch(p) && m == 'GET') {
+      return (
+        200,
+        [
+          {
+            'id': 1,
+            'user': 'user-demo',
+            'phone_e164': '+254712345678',
+            'display_name': 'Demo User',
+            'role': 'owner',
+            'granted_at': _daysAhead(-100),
+            'revoked_at': null,
+          },
+        ],
+      );
+    }
+    if (RegExp(r'^/sites/[^/]+/members$').hasMatch(p) && m == 'POST') {
+      return (
+        201,
+        {
+          'id': 2,
+          'user': 'user-x',
+          'role': (o.data is Map) ? '${(o.data as Map)['role']}' : 'member',
+          'granted_at': _hoursAgo(0),
+        },
+      );
+    }
+    if (p == '/audit-log') {
+      return (
+        200,
+        {
+          'next': null,
+          'previous': null,
+          'results': [
+            {
+              'id': 1,
+              'action_type': 'auth.login',
+              'category': 'auth',
+              'entity': 'AuthSession',
+              'created_at': _hoursAgo(0),
+            },
+            {
+              'id': 2,
+              'action_type': 'site.updated',
+              'category': 'config',
+              'entity': 'Site',
+              'created_at': _hoursAgo(5),
+            },
+          ],
+        },
+      );
+    }
 
     if (p.endsWith('/telemetry/live')) {
       return (
@@ -540,4 +677,33 @@ abstract final class MockFixtures {
 
   static String _hoursAgo(int h) =>
       DateTime.now().subtract(Duration(hours: h)).toIso8601String();
+
+  static String _daysAhead(int d) =>
+      DateTime.now().add(Duration(days: d)).toIso8601String();
+
+  static Map<String, dynamic> _site(String id, String label) => {
+    'site_id': id,
+    'tenant_id': 'tenant-demo',
+    'label': label,
+    'timezone': 'Africa/Nairobi',
+    'meter_type': 'prepaid',
+    'supply_phase': 'single',
+    'status': 'active',
+    'local_api_port': 8443,
+    'allow_lan_commands': true,
+    'allow_cloud_commands': true,
+    'created_at': _daysAhead(-90),
+  };
+
+  /// Unsigned demo JWT with an `exp` claim; only the payload is read client-side.
+  static String _jwt({required int minutes}) {
+    String seg(Map<String, Object> m) =>
+        base64Url.encode(utf8.encode(jsonEncode(m))).replaceAll('=', '');
+    final exp =
+        DateTime.now().add(Duration(minutes: minutes)).millisecondsSinceEpoch ~/
+        1000;
+    return '${seg({'alg': 'none'})}.'
+        '${seg({'exp': exp, 'refresh_jti': 'demo-jti', 'tenant_id': 'tenant-demo'})}.'
+        'demo';
+  }
 }

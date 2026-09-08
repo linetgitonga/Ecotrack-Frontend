@@ -10,11 +10,35 @@ RequestOptions _req(String path, {String method = 'GET', Object? data}) =>
 void main() {
   final rng = Random(1);
 
-  test('handles Tier-B paths only', () {
+  test('handles Tier-B paths', () {
     expect(MockFixtures.handles(_req('/telemetry/live')), isTrue);
     expect(MockFixtures.handles(_req('/costs/summary')), isTrue);
-    expect(MockFixtures.handles(_req('/sites')), isFalse);
-    expect(MockFixtures.handles(_req('/auth/otp/request')), isFalse);
+  });
+
+  test('handles auth + core paths for the offline demo', () {
+    expect(MockFixtures.handles(_req('/auth/otp/verify')), isTrue);
+    expect(MockFixtures.handles(_req('/me')), isTrue);
+    expect(MockFixtures.handles(_req('/sites')), isTrue);
+  });
+
+  test('does not handle unknown paths', () {
+    expect(MockFixtures.handles(_req('/webhooks/mpesa/daraja')), isFalse);
+  });
+
+  test('otp verify returns a decodable token pair', () {
+    final (status, body) = MockFixtures.respond(
+      _req('/auth/otp/verify', method: 'POST', data: {'code': '123456'}),
+      rng,
+    )!;
+    expect(status, 200);
+    final m = body as Map;
+    expect((m['access'] as String).split('.'), hasLength(3));
+    expect(m['refresh'], isA<String>());
+  });
+
+  test('/me returns an owner', () {
+    final (_, body) = MockFixtures.respond(_req('/me'), rng)!;
+    expect((body as Map)['role'], 'owner');
   });
 
   test('telemetry/live returns a devices array with live readings', () {
