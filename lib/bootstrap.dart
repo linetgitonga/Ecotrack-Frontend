@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -60,6 +61,20 @@ Future<void> bootstrap(Environment environment) async {
     defaults: _defaultsByEnv[environment]!,
   );
 
+  // Error capture without a custom zone (a zone mismatch between
+  // `ensureInitialized` and `runApp` causes hard-to-debug bugs).
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    // Hook point: forward to crash reporting when config.sentryDsn is set.
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    if (config.enableLogging) {
+      debugPrint('Uncaught platform error: $error\n$stack');
+    }
+    // Hook point: forward to crash reporting. Return true = handled.
+    return true;
+  };
+
   await configureDependencies(config);
 
   // Register outbox handlers before the sync engine drains anything.
@@ -76,15 +91,5 @@ Future<void> bootstrap(Environment environment) async {
   // (AuthBloc's constructor also wires SessionManager into the auth interceptor.)
   getIt<AuthBloc>().add(const AuthStarted());
 
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    // Hook point: forward to crash reporting when config.sentryDsn is set.
-  };
-
-  runZonedGuarded(() => runApp(const EcoTrackApp()), (error, stack) {
-    if (config.enableLogging) {
-      debugPrint('Uncaught zone error: $error\n$stack');
-    }
-    // Hook point: forward to crash reporting.
-  });
+  runApp(const EcoTrackApp());
 }
