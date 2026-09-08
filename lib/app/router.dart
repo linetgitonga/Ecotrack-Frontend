@@ -13,10 +13,15 @@ import '../features/account/presentation/pages/sessions_page.dart';
 import '../features/account/presentation/pages/site_form_page.dart';
 import '../features/account/presentation/pages/sites_page.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/alerts/presentation/pages/alerts_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/otp_verify_page.dart';
+import '../features/automation/presentation/pages/automation_page.dart';
+import '../features/devices/presentation/pages/device_detail_page.dart';
 import '../features/devices/presentation/pages/devices_page.dart';
+import '../features/devices/presentation/pages/pairing_page.dart';
 import '../features/home/presentation/pages/home_dashboard_page.dart';
+import '../features/insights/presentation/pages/insights_page.dart';
 import '../features/shell/presentation/pages/root_shell.dart';
 import '../features/shell/presentation/pages/splash_page.dart';
 
@@ -114,7 +119,7 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
                   GoRoute(
                     path: 'alerts',
                     parentNavigatorKey: _rootKey,
-                    builder: (_, _) => const TabPlaceholder('Alerts'),
+                    builder: (_, _) => const AlertsPage(),
                   ),
                 ],
               ),
@@ -125,6 +130,19 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
               GoRoute(
                 path: Routes.devices,
                 builder: (_, _) => const DevicesPage(),
+                routes: [
+                  GoRoute(
+                    path: 'add',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const PairingPage(),
+                  ),
+                  GoRoute(
+                    path: ':deviceId',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, s) =>
+                        DeviceDetailPage(deviceId: s.pathParameters['deviceId']!),
+                  ),
+                ],
               ),
             ],
           ),
@@ -132,7 +150,7 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
             routes: [
               GoRoute(
                 path: Routes.insights,
-                builder: (_, _) => const TabPlaceholder('Insights'),
+                builder: (_, _) => const InsightsPage(),
               ),
             ],
           ),
@@ -140,7 +158,7 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
             routes: [
               GoRoute(
                 path: Routes.automation,
-                builder: (_, _) => const TabPlaceholder('Automation'),
+                builder: (_, _) => const AutomationPage(),
               ),
             ],
           ),

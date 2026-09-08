@@ -55,6 +55,9 @@ dependencies:
   # Per-flavor runtime config from bundled .env.* assets
   flutter_dotenv: ^5.1.0
 
+  # Charts
+  fl_chart: ^1.0.0
+
   # Utilities
   intl: ^0.20.3
   uuid: ^4.6.0

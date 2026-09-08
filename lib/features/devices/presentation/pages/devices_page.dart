@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../app/router.dart';
 import '../../../../app/themes/spacing.dart';
 import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/formatters.dart';
@@ -42,6 +44,16 @@ class _DevicesView extends StatelessWidget {
             child: Center(child: ConnectionStatusIndicator()),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          final added = await context.push<bool>('${Routes.devices}/add');
+          if (added == true && context.mounted) {
+            context.read<DeviceListCubit>().load();
+          }
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add device'),
       ),
       body: BlocConsumer<DeviceListCubit, DeviceListState>(
         listenWhen: (p, c) => c.error != null && p.error != c.error,
@@ -186,6 +198,7 @@ class _DeviceRow extends StatelessWidget {
                     ? (_) => onToggle()
                     : null,
               ),
+        onTap: () => context.push(Routes.device(device.id)),
       ),
     );
   }

@@ -201,6 +201,13 @@ abstract final class MockFixtures {
     if (p.contains('/tariffs/current')) {
       return (200, _tariff());
     }
+    if (p.contains('/hubs') && p.endsWith('/pairing-mode') && m == 'POST') {
+      _pairingOpenedAt = DateTime.now();
+      return (200, {'ok': true, 'ttl_s': 120});
+    }
+    if (p.contains('/devices/commissioning')) {
+      return (200, _commissioning());
+    }
     if (p.contains('/hubs') && m == 'GET') {
       return (200, [_hub()]);
     }
@@ -433,6 +440,29 @@ abstract final class MockFixtures {
       'is_critical': false,
     },
   ];
+
+  static DateTime? _pairingOpenedAt;
+
+  static List<Map<String, dynamic>> _commissioning() {
+    final since = _pairingOpenedAt == null
+        ? 999
+        : DateTime.now().difference(_pairingOpenedAt!).inSeconds;
+    if (since < 4) return const [];
+    final status = since < 10
+        ? 'interviewing'
+        : since < 16
+            ? 'joined'
+            : 'configured';
+    return [
+      {
+        'device_id': 'd-new-plug',
+        'friendly_name': 'New smart plug',
+        'commissioning_status': status,
+        'commissioning_error': null,
+        'ieee_addr': '0x00124b0021abcd12',
+      },
+    ];
+  }
 
   static Map<String, dynamic> _hub() => {
     'hub_id': 'hub-1',
