@@ -5,6 +5,7 @@ import 'package:dio/io.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../data/remote/api/api_client.dart';
+import '../../data/remote/mock/mock_interceptor.dart';
 import '../auth/token_store.dart';
 import '../config/env_config.dart';
 import '../constants/api_endpoints.dart';
@@ -43,6 +44,7 @@ abstract class NetworkModule {
     );
 
     dio.interceptors.addAll([
+      MockInterceptor(),
       ConnectivityInterceptor(wiring.hasConnection),
       AuthInterceptor(
         dio: dio,

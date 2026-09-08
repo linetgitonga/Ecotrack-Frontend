@@ -15,7 +15,8 @@ import '../features/account/presentation/pages/sites_page.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/otp_verify_page.dart';
-import '../features/home/presentation/pages/home_placeholder_page.dart';
+import '../features/devices/presentation/pages/devices_page.dart';
+import '../features/home/presentation/pages/home_dashboard_page.dart';
 import '../features/shell/presentation/pages/root_shell.dart';
 import '../features/shell/presentation/pages/splash_page.dart';
 
@@ -108,7 +109,14 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
             routes: [
               GoRoute(
                 path: Routes.home,
-                builder: (_, _) => const HomePlaceholderPage(),
+                builder: (_, _) => const HomeDashboardPage(),
+                routes: [
+                  GoRoute(
+                    path: 'alerts',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const TabPlaceholder('Alerts'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -116,7 +124,7 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
             routes: [
               GoRoute(
                 path: Routes.devices,
-                builder: (_, _) => const TabPlaceholder('Devices'),
+                builder: (_, _) => const DevicesPage(),
               ),
             ],
           ),

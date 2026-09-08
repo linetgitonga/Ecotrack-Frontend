@@ -38,6 +38,7 @@ import '../data/remote/api/audit_api.dart' as _i897;
 import '../data/remote/api/auth_api.dart' as _i765;
 import '../data/remote/api/me_api.dart' as _i286;
 import '../data/remote/api/sites_api.dart' as _i334;
+import '../data/remote/api/tierb_api.dart' as _i258;
 import '../data/repositories/auth_repository.dart' as _i578;
 import '../data/repositories/site_repository.dart' as _i667;
 import '../features/account/presentation/bloc/members_cubit.dart' as _i869;
@@ -46,6 +47,8 @@ import '../features/account/presentation/bloc/site_bloc.dart' as _i25;
 import '../features/auth/presentation/bloc/auth_bloc.dart' as _i59;
 import '../features/connectivity/presentation/bloc/connectivity_bloc.dart'
     as _i612;
+import '../features/devices/presentation/bloc/device_list_cubit.dart' as _i737;
+import '../features/home/presentation/bloc/home_dashboard_bloc.dart' as _i305;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -139,8 +142,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i334.SitesApi>(
       () => _i334.SitesApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
     );
+    gh.lazySingleton<_i258.TierBApi>(
+      () => _i258.TierBApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
+    );
     gh.lazySingleton<_i4.StepUpController>(
       () => _i4.StepUpController(gh<_i765.AuthApi>()),
+    );
+    gh.factory<_i737.DeviceListCubit>(
+      () => _i737.DeviceListCubit(gh<_i258.TierBApi>()),
+    );
+    gh.factory<_i305.HomeDashboardBloc>(
+      () => _i305.HomeDashboardBloc(gh<_i258.TierBApi>()),
     );
     gh.lazySingleton<_i667.SiteRepository>(
       () => _i667.SiteRepository(

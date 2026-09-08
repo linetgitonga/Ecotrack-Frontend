@@ -15,6 +15,7 @@ class EnvConfig {
     required this.apiBaseUrl,
     required this.sentryDsn,
     required this.enableLogging,
+    this.mockMode = false,
   });
 
   final Environment environment;
@@ -26,6 +27,10 @@ class EnvConfig {
 
   /// Verbose logging / debug tooling. Should be false for `prod`.
   final bool enableLogging;
+
+  /// When true, Tier-B endpoints (System_Design §8, not yet deployed) are
+  /// served from `data/remote/mock/fixtures`. Default: on for `dev`.
+  final bool mockMode;
 
   bool get isProd => environment == Environment.prod;
 
@@ -57,12 +62,16 @@ class EnvConfig {
   }) {
     String read(String key) => dotenv.env[key] ?? defaults[key] ?? '';
 
+    final mockRaw = read('ENABLE_MOCK').toLowerCase();
     final config = EnvConfig(
       environment: environment,
       appName: read('APP_NAME'),
       apiBaseUrl: read('API_BASE_URL'),
       sentryDsn: read('SENTRY_DSN'),
       enableLogging: read('ENABLE_LOGGING').toLowerCase() == 'true',
+      mockMode: mockRaw.isEmpty
+          ? environment == Environment.dev
+          : mockRaw == 'true',
     );
     init(config);
     return config;
