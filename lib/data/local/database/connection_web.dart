@@ -1,11 +1,28 @@
 import 'package:drift/drift.dart';
+import 'package:drift/wasm.dart';
+import 'package:flutter/foundation.dart';
 
-/// Web database — the drift WASM worker + `sqlite3.wasm` asset are wired in
-/// Phase 9 (web dashboard). Until then the web build compiles but the DB is not
-/// usable; the web dashboard is cloud-transport-only and not yet shipped.
+/// Web database — drift on `sqlite3.wasm` with a shared worker for OPFS/IndexedDB
+/// persistence. The two assets (`web/sqlite3.wasm`, `web/drift_worker.js`) are
+/// checked into `web/`.
+///
+/// If persistence isn't available (private window, old browser) drift falls back
+/// to an in-memory database automatically — the web dashboard is cloud-first, so
+/// a cold cache just means one extra fetch.
 QueryExecutor openConnection() {
-  throw UnsupportedError(
-    'The on-device database is not available on web yet (Phase 9). '
-    'Load ecotrack on Android or iOS.',
-  );
+  return LazyDatabase(() async {
+    final result = await WasmDatabase.open(
+      databaseName: 'ecotrack',
+      sqlite3Uri: Uri.parse('sqlite3.wasm'),
+      driftWorkerUri: Uri.parse('drift_worker.js'),
+    );
+
+    if (result.missingFeatures.isNotEmpty && kDebugMode) {
+      debugPrint(
+        'drift/web: degraded persistence (${result.missingFeatures}) — '
+        'using ${result.chosenImplementation}',
+      );
+    }
+    return result.resolvedExecutor;
+  });
 }

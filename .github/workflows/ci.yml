@@ -48,6 +48,7 @@ jobs:
       matrix:
         include:
           - { os: ubuntu-latest, platform: android, cmd: "flutter build apk --debug --flavor dev -t lib/main_dev.dart" }
+          - { os: ubuntu-latest, platform: web, cmd: "flutter build web --release -t lib/main_prod.dart" }
           - { os: macos-latest, platform: ios, cmd: "flutter build ios --debug --no-codesign --flavor dev -t lib/main_dev.dart" }
     steps:
       - uses: actions/checkout@v4

@@ -9,6 +9,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../injection/injection.dart';
 import '../../../../shared/widgets/eco_states.dart';
+import '../../../../shared/widgets/responsive.dart';
 import '../../../account/presentation/bloc/site_bloc.dart';
 import '../bloc/portfolio_cubit.dart';
 
@@ -118,6 +119,7 @@ class _Units extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (useTableLayout(context)) return _table(context);
     return ListView.separated(
       padding: const EdgeInsets.all(EcoSpacing.lg),
       itemCount: state.units.length,
@@ -143,6 +145,43 @@ class _Units extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _table(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(EcoSpacing.lg),
+      child: MaxWidthBox(
+        maxWidth: 1100,
+        child: Card(
+          child: DataTable(
+            showCheckboxColumn: false,
+            columns: const [
+              DataColumn(label: Text('Unit')),
+              DataColumn(label: Text('Live'), numeric: true),
+              DataColumn(label: Text('Today'), numeric: true),
+              DataColumn(label: Text('Month cost'), numeric: true),
+              DataColumn(label: Text('Alerts'), numeric: true),
+              DataColumn(label: Text('Status')),
+            ],
+            rows: [
+              for (final u in state.units)
+                DataRow(
+                  onSelectChanged: (_) =>
+                      context.push(Routes.portfolioUnit(u.site.id)),
+                  cells: [
+                    DataCell(Text(u.site.label)),
+                    DataCell(Text(Formatters.watts(u.liveWatts))),
+                    DataCell(Text(Formatters.kwh(u.todayKwh))),
+                    DataCell(Text(u.monthCost.formattedWithEstimate)),
+                    DataCell(Text('${u.openAlerts}')),
+                    DataCell(Text(u.status)),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import '../../../../core/extensions/context_extensions.dart';
 import '../../../../core/sync/sync_engine.dart';
 import '../../../account/presentation/bloc/site_bloc.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../../shared/widgets/responsive.dart';
 import '../../../connectivity/presentation/bloc/sync_cubit.dart';
 import '../../../connectivity/presentation/widgets/connection_status_indicator.dart';
 
@@ -105,7 +106,7 @@ class _WideLayout extends StatelessWidget {
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(child: shell),
+          Expanded(child: MaxWidthBox(maxWidth: 1200, child: shell)),
         ],
       ),
     );

@@ -8,6 +8,7 @@ import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/connectivity/presentation/bloc/connectivity_bloc.dart';
 import '../features/connectivity/presentation/bloc/sync_cubit.dart';
 import '../injection/injection.dart';
+import '../shared/widgets/web_cookie_notice.dart';
 import 'router.dart';
 import 'themes/theme.dart';
 
@@ -45,6 +46,8 @@ class EcoTrackApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
+            builder: (context, child) =>
+                WebCookieNotice(child: child ?? const SizedBox.shrink()),
           );
         },
       ),
