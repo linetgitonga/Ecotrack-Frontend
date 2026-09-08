@@ -1,25 +1,75 @@
 default_platform(:ios)
 
+# ---------------------------------------------------------------------------
+# EcoTrack — iOS delivery lanes
+#
+# Run from the `ios/` directory:  bundle exec fastlane deploy_to_testflight
+#
+# CI injects (see .github/workflows/deploy.yml):
+#   MATCH_PASSWORD                       -> decrypts the match certificates repo
+#   MATCH_GIT_BASIC_AUTHORIZATION        -> base64("user:PAT") to clone that repo
+#   APP_STORE_CONNECT_API_KEY_KEY_ID     -> ASC API key id
+#   APP_STORE_CONNECT_API_KEY_ISSUER_ID  -> ASC API key issuer id
+#   APP_STORE_CONNECT_API_KEY_KEY        -> the .p8 contents (base64, single line)
+# ---------------------------------------------------------------------------
+
+FLUTTER_FLAVOR = "prod"
+FLUTTER_TARGET = "lib/main_prod.dart"
+BUNDLE_ID      = ENV["IOS_BUNDLE_ID"] || "com.ecotrack.app"
+PROJECT_ROOT   = File.expand_path("../..", __dir__)
+IPA_OUTPUT     = File.join(PROJECT_ROOT, "build/ios/ipa/ecotrack.ipa")
+
 platform :ios do
-  desc "Push a new build to TestFlight"
+  desc "Build the prod IPA and upload it to TestFlight"
   lane :deploy_to_testflight do
-    # Fetch certs/profiles using Match (requires MATCH_PASSWORD env var in CI)
-    match(
-      type: "appstore",
-      readonly: true,
-      app_identifier: "com.example.ecotrack"
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ISSUER_ID"),
+      key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY_KEY"),
+      is_key_content_base64: true,
+      in_house: false
     )
 
-    # Build the app using the 'prod' scheme
+    # Pull signing assets from the private certificates repo (read-only in CI).
+    match(
+      type: "appstore",
+      app_identifier: BUNDLE_ID,
+      readonly: true,
+      api_key: api_key
+    )
+
+    # Compile the Flutter layer for the prod flavor. --no-codesign: gym signs.
+    Dir.chdir(PROJECT_ROOT) do
+      sh("flutter", "pub", "get")
+      sh(
+        "flutter", "build", "ios",
+        "--flavor", FLUTTER_FLAVOR,
+        "--target", FLUTTER_TARGET,
+        "--release",
+        "--no-codesign",
+        "--build-number=#{ENV['CI_BUILD_NUMBER'] || Time.now.to_i}"
+      )
+    end
+
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "prod",
-      export_method: "app-store"
+      configuration: "Release-prod",
+      export_method: "app-store",
+      output_directory: File.dirname(IPA_OUTPUT),
+      output_name: File.basename(IPA_OUTPUT),
+      export_options: {
+        provisioningProfiles: {
+          BUNDLE_ID => "match AppStore #{BUNDLE_ID}"
+        }
+      }
     )
 
-    # Upload to TestFlight (requires APP_STORE_CONNECT_API_KEY env vars in CI)
     upload_to_testflight(
-      skip_waiting_for_build_processing: true
+      api_key: api_key,
+      ipa: IPA_OUTPUT,
+      skip_waiting_for_build_processing: true,
+      distribute_external: false
     )
   end
 end

@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master, main]
+  push:
+    branches: [master, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-analysis-and-tests:
+    name: Analyze + test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Seed .env files (CI placeholders — no secrets needed for tests)
+        run: |
+          for e in dev staging prod; do cp .env.example ".env.$e"; done
+
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: flutter analyze
+      - run: flutter test --coverage
+
+  build-smoke:
+    name: Debug build (${{ matrix.platform }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: android, cmd: "flutter build apk --debug --flavor dev -t lib/main_dev.dart" }
+          - { os: macos-latest, platform: ios, cmd: "flutter build ios --debug --no-codesign --flavor dev -t lib/main_dev.dart" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        if: matrix.platform == 'android'
+        with: { distribution: temurin, java-version: "17" }
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - run: for e in dev staging prod; do cp .env.example ".env.$e"; done
+      - run: flutter pub get
+      - run: ${{ matrix.cmd }}

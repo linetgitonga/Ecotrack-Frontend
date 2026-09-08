@@ -1,19 +1,67 @@
 default_platform(:android)
 
+# ---------------------------------------------------------------------------
+# EcoTrack — Android delivery lanes
+#
+# Run from the `android/` directory:  bundle exec fastlane deploy_to_internal
+#
+# CI injects (see .github/workflows/deploy.yml):
+#   PLAY_STORE_JSON_KEY_FILE  -> path to the Google Play service-account JSON
+#   key.properties            -> upload keystore config (consumed by build.gradle)
+# ---------------------------------------------------------------------------
+
+FLUTTER_FLAVOR       = "prod"
+FLUTTER_TARGET       = "lib/main_prod.dart"
+PROJECT_ROOT         = File.expand_path("../..", __dir__)
+AAB_OUTPUT           = File.join(
+  PROJECT_ROOT,
+  "build/app/outputs/bundle/#{FLUTTER_FLAVOR}Release/app-#{FLUTTER_FLAVOR}-release.aab"
+)
+
 platform :android do
-  desc "Deploy a new build to the Google Play Internal Track"
+  desc "Build the prod App Bundle and upload it to the Google Play Internal track"
   lane :deploy_to_internal do
-    # Requires service_account.json to be injected by CI
-    gradle(
-      task: "bundle",
-      flavor: "Prod",
-      build_type: "Release"
-    )
+    build_appbundle
 
     upload_to_play_store(
-      track: 'internal',
-      aab: '../build/app/outputs/bundle/prodRelease/app-prod-release.aab',
-      json_key: ENV["PLAY_STORE_JSON_KEY_FILE"] # Path to injected JSON file
+      track: "internal",
+      aab: AAB_OUTPUT,
+      json_key: File.expand_path(ENV.fetch("PLAY_STORE_JSON_KEY_FILE", "service_account.json")),
+      release_status: "draft",
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
     )
+  end
+
+  desc "Promote the latest Internal build to the Production track (staged rollout)"
+  lane :promote_to_production do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production",
+      rollout: "0.1",
+      json_key: File.expand_path(ENV.fetch("PLAY_STORE_JSON_KEY_FILE", "service_account.json")),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  # Uses the Flutter toolchain (not raw `gradle`) so the correct flavored
+  # entrypoint + .env asset are bundled.
+  private_lane :build_appbundle do
+    Dir.chdir(PROJECT_ROOT) do
+      sh("flutter", "pub", "get")
+      sh(
+        "flutter", "build", "appbundle",
+        "--flavor", FLUTTER_FLAVOR,
+        "--target", FLUTTER_TARGET,
+        "--release",
+        "--build-number=#{ENV['CI_BUILD_NUMBER'] || Time.now.to_i}"
+      )
+    end
   end
 end

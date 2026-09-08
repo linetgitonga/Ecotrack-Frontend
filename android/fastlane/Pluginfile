@@ -1,0 +1,2 @@
+# Fastlane plugins for the Android pipeline. Install with:  bundle exec fastlane install_plugins
+# (none required yet — file kept so `fastlane` doesn't warn and plugins are pinned via Gemfile.lock)

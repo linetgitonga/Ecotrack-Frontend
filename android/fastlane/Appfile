@@ -1,0 +1,6 @@
+# Play Store package name for the flavor we ship to the store (prod).
+package_name(ENV["ANDROID_PACKAGE_NAME"] || "com.ecotrack.app")
+
+# Path to the Google Play service-account JSON. CI writes this file from the
+# PLAY_STORE_JSON_KEY_BASE64 secret; see .github/workflows/deploy.yml.
+json_key_file(ENV["PLAY_STORE_JSON_KEY_FILE"] || "service_account.json")

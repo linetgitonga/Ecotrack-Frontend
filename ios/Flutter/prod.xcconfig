@@ -1,3 +1,5 @@
+// Included by the "Debug-prod" / "Release-prod" / "Profile-prod" build configs.
 #include "Generated.xcconfig"
-APP_DISPLAY_NAME=EcoTrack
-PRODUCT_BUNDLE_IDENTIFIER=com.example.ecotrack
+
+APP_DISPLAY_NAME = EcoTrack
+PRODUCT_BUNDLE_IDENTIFIER = com.ecotrack.app

@@ -1,0 +1,8 @@
+# Store-facing bundle id (prod flavor).
+app_identifier(ENV["IOS_BUNDLE_ID"] || "com.ecotrack.app")
+
+# Apple Developer Portal team. Prefer App Store Connect API key auth in CI
+# (APP_STORE_CONNECT_API_KEY_* env vars) over Apple ID + password.
+apple_id(ENV["FASTLANE_APPLE_ID"] || "apple-developer@ecotrack.app")
+itc_team_id(ENV["APP_STORE_CONNECT_TEAM_ID"])   # App Store Connect team id
+team_id(ENV["APPLE_DEVELOPER_TEAM_ID"])          # Developer Portal team id

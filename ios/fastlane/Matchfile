@@ -1,7 +1,17 @@
-git_url("https://github.com/your-org/ios-certificates.git")
+# match — code signing as code.
+# Certificates + provisioning profiles live ENCRYPTED in a SEPARATE PRIVATE repo,
+# decrypted at build time with MATCH_PASSWORD. This repo never contains signing
+# assets. Docs: https://docs.fastlane.tools/actions/match/
 
+git_url(ENV["MATCH_GIT_URL"] || "git@github.com:ecotrack-org/ios-certificates.git")
 storage_mode("git")
-type("appstore")
+git_branch("main")
 
-app_identifier(["com.example.ecotrack"])
-username("apple_developer@example.com") 
+# App Store distribution assets for the prod bundle id.
+type("appstore")
+app_identifier(["com.ecotrack.app"])
+
+# Prefer App Store Connect API key auth (set APP_STORE_CONNECT_API_KEY_* in CI).
+# username(ENV["FASTLANE_APPLE_ID"])   # only for local, interactive use
+
+readonly(true)   # CI must never regenerate certs; run `match` manually to rotate.

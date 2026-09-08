@@ -1,69 +1,120 @@
-name: Deploy Mobile Apps (DevOps Pipeline)
+name: Deploy (Play Internal + TestFlight)
 
+# Ship on version tags only: git tag v1.2.3 && git push origin v1.2.3
 on:
   push:
     tags:
-      - 'v*.*.*' # Triggers on version tags e.g. v1.0.0
+      - "v*.*.*"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_CHANNEL: stable
+  JAVA_VERSION: "17"
+  # Monotonic build number shared by both stores.
+  CI_BUILD_NUMBER: ${{ github.run_number }}
 
 jobs:
-  build_and_deploy:
-    name: Build & Deploy Android & iOS
+  deploy:
+    name: Build & deploy Android + iOS
     runs-on: macos-latest
-    
+    timeout-minutes: 60
+
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
+      - name: Set up Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Set up Flutter
+      - name: Set up Flutter (${{ env.FLUTTER_CHANNEL }})
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.x' # Specify your stable version
-          channel: 'stable'
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
 
-      - name: Flutter Pub Get
+      - name: Set up Ruby + Bundler (Fastlane)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: android   # cache android/ gems; ios/ installed below
+
+      - name: flutter pub get
         run: flutter pub get
 
-      - name: Run Tests
-        run: flutter test
+      - name: flutter analyze
+        run: flutter analyze
 
-      - name: Setup Dotenv (Prod)
-        run: echo "${{ secrets.ENV_PROD }}" > .env.prod
+      - name: flutter test
+        run: flutter test --coverage
 
-      # ==========================================
-      # ANDROID DEPLOYMENT
-      # ==========================================
-      - name: Decode Android Keystore
+      # ---------------------------------------------------------------------
+      # Materialize secrets -> files (all sourced from GitHub Secrets)
+      # ---------------------------------------------------------------------
+      - name: Write .env files
+        run: |
+          printf '%s' "${{ secrets.ENV_DEV }}"     > .env.dev
+          printf '%s' "${{ secrets.ENV_STAGING }}" > .env.staging
+          printf '%s' "${{ secrets.ENV_PROD }}"    > .env.prod
+
+      - name: Restore Android upload keystore
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
-          echo "storeFile=upload-keystore.jks" > android/key.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          cat > android/key.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
 
-      - name: Decode Play Store JSON Key
+      - name: Restore Google Play service account JSON
         run: echo "${{ secrets.PLAY_STORE_JSON_KEY_BASE64 }}" | base64 --decode > android/service_account.json
 
-      - name: Deploy Android to Internal Track
+      # ---------------------------------------------------------------------
+      # ANDROID -> Google Play Internal track
+      # ---------------------------------------------------------------------
+      - name: Fastlane · deploy_to_internal
         working-directory: android
         env:
-          PLAY_STORE_JSON_KEY_FILE: "service_account.json"
+          PLAY_STORE_JSON_KEY_FILE: service_account.json
+          ANDROID_PACKAGE_NAME: com.ecotrack.app
         run: bundle exec fastlane deploy_to_internal
 
-      # ==========================================
-      # IOS DEPLOYMENT
-      # ==========================================
-      - name: Deploy iOS to TestFlight
+      # ---------------------------------------------------------------------
+      # iOS -> TestFlight
+      # ---------------------------------------------------------------------
+      - name: Install iOS Fastlane gems
+        working-directory: ios
+        run: bundle install --jobs 4 --retry 3
+
+      - name: Fastlane · deploy_to_testflight
         working-directory: ios
         env:
+          IOS_BUNDLE_ID: com.ecotrack.app
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_P8_KEY_BASE64 }} # Fastlane can decode base64 keys natively or you can decode it to a file
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_P8_BASE64 }}
+          APPLE_DEVELOPER_TEAM_ID: ${{ secrets.APPLE_DEVELOPER_TEAM_ID }}
+          APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
         run: bundle exec fastlane deploy_to_testflight
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-outputs
+          path: |
+            build/app/outputs/bundle/**/*.aab
+            build/ios/ipa/*.ipa
+          if-no-files-found: ignore
+          retention-days: 7

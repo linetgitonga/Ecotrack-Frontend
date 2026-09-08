@@ -1,0 +1,7 @@
+# Copy to android/key.properties for local release builds. NEVER commit the real
+# file (it is git-ignored). In CI this is generated from GitHub Secrets by the
+# "Decode Android Keystore" step in .github/workflows/deploy.yml.
+storeFile=upload-keystore.jks
+storePassword=CHANGE_ME
+keyAlias=upload
+keyPassword=CHANGE_ME

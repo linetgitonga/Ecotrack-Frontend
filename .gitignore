@@ -1,28 +1,93 @@
-# Flutter/Dart/Pub
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
 .dart_tool/
-.packages
-build/
+.flutter-plugins-dependencies
 .pub-cache/
 .pub/
+/build/
+/coverage/
 
-# Secrets & Environments
-.env*
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Widget Preview related
+.widget_preview/
+
+# ===========================================================================
+# SECRETS & ENVIRONMENTS  — never commit real values
+# (.gitignore does NOT support trailing comments — keep patterns on their own line)
+# ===========================================================================
+.env
+.env.*
+# .env.example is the one committed env file: keys only, no values
+!.env.example
+
+# Android signing
 *.jks
 *.keystore
-key.properties
-service_account.json
+**/key.properties
+android/app/upload-keystore.jks
+
+# Google Play / service accounts
+**/service_account.json
+**/play-store-*.json
 android-fastlane-json-key.json
 
-# iOS & Fastlane artifacts
-ios/Pods/
-.symlinks/
-*.ipa
-*.dSYM.zip
+# Apple / App Store Connect
 *.mobileprovision
 *.cer
+*.certSigningRequest
+*.p12
+*.p8
+**/AuthKey_*.p8
+ios/fastlane/*.p8
 
-# Fastlane specific
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots/**/*.png
-*/fastlane/test_output
+# ===========================================================================
+# Fastlane build artifacts & reports
+# ===========================================================================
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots/**/*.png
+**/fastlane/test_output/
+**/fastlane/README.md
+**/fastlane/.env*
+vendor/bundle/
+.bundle/
+
+# Local Gradle / Android SDK pointer
+android/local.properties
+android/.gradle/
