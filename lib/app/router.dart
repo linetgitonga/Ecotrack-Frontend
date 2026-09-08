@@ -24,6 +24,8 @@ import '../features/devices/presentation/pages/devices_page.dart';
 import '../features/devices/presentation/pages/pairing_page.dart';
 import '../features/home/presentation/pages/home_dashboard_page.dart';
 import '../features/insights/presentation/pages/insights_page.dart';
+import '../features/manager/presentation/pages/portfolio_page.dart';
+import '../features/manager/presentation/pages/unit_detail_page.dart';
 import '../features/shell/presentation/pages/root_shell.dart';
 import '../features/shell/presentation/pages/splash_page.dart';
 
@@ -42,6 +44,10 @@ abstract final class Routes {
   static const insights = '/insights';
   static const automation = '/automation';
   static const alerts = '/alerts';
+
+  static const portfolio = '/account/portfolio';
+  static String portfolioUnit(String siteId) =>
+      '/account/portfolio/units/$siteId';
 
   static const account = '/account';
   static const accountSites = '/account/sites';
@@ -171,6 +177,19 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
                 path: Routes.account,
                 builder: (_, _) => const AccountPage(),
                 routes: [
+                  GoRoute(
+                    path: 'portfolio',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const PortfolioPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'units/:siteId',
+                        parentNavigatorKey: _rootKey,
+                        builder: (_, s) =>
+                            UnitDetailPage(siteId: s.pathParameters['siteId']!),
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: 'sites',
                     parentNavigatorKey: _rootKey,

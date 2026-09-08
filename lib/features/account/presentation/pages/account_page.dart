@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/router.dart';
 import '../../../../app/themes/spacing.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../domain/value_objects/role.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../connectivity/presentation/widgets/connection_status_indicator.dart';
 import '../bloc/site_bloc.dart';
@@ -16,6 +17,8 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.select((AuthBloc b) => b.user);
     final siteCount = context.select((SiteBloc b) => b.state.sites.length);
+    final canSeePortfolio =
+        siteCount > 1 && user?.role == Role.owner;
 
     return Scaffold(
       appBar: AppBar(
@@ -40,6 +43,13 @@ class AccountPage extends StatelessWidget {
           const SizedBox(height: EcoSpacing.lg),
           _SectionCard(
             children: [
+              if (canSeePortfolio)
+                _Tile(
+                  icon: Icons.apartment_outlined,
+                  title: 'Portfolio',
+                  subtitle: 'Overview across your $siteCount sites',
+                  onTap: () => context.push(Routes.portfolio),
+                ),
               _Tile(
                 icon: Icons.home_work_outlined,
                 title: 'Sites',
