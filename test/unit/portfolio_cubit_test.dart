@@ -68,10 +68,9 @@ void main() {
     'empty site list → loaded with no units',
     build: () => PortfolioCubit(api),
     act: (c) => c.load([]),
-    expect: () => [
-      isA<PortfolioState>()
-          .having((s) => s.loading, 'loading', false)
-          .having((s) => s.units, 'units', isEmpty),
-    ],
+    verify: (c) {
+      expect(c.state.loading, isFalse);
+      expect(c.state.units, isEmpty);
+    },
   );
 }
