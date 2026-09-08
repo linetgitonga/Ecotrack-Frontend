@@ -57,11 +57,12 @@ class _UnitDetailPageState extends State<UnitDetailPage> {
   @override
   Widget build(BuildContext context) {
     final site = context.read<SiteBloc>().state.sites.firstWhere(
-          (s) => s.id == widget.siteId,
-          orElse: () => throw StateError('site not found'),
-        );
-    final openAlerts =
-        _alerts.where((a) => a.status == AlertStatus.open).toList();
+      (s) => s.id == widget.siteId,
+      orElse: () => throw StateError('site not found'),
+    );
+    final openAlerts = _alerts
+        .where((a) => a.status == AlertStatus.open)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(title: Text(site.label)),
@@ -78,8 +79,7 @@ class _UnitDetailPageState extends State<UnitDetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Meter',
-                              style: context.textTheme.labelMedium),
+                          Text('Meter', style: context.textTheme.labelMedium),
                           Text(
                             '${site.isPrepaid ? 'Prepaid' : 'Postpaid'} · '
                             '${site.supplyPhase} phase'
@@ -94,12 +94,16 @@ class _UnitDetailPageState extends State<UnitDetailPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: _Stat('Live',
-                            Formatters.watts(_usage?.liveWatts ?? 0)),
+                        child: _Stat(
+                          'Live',
+                          Formatters.watts(_usage?.liveWatts ?? 0),
+                        ),
                       ),
                       Expanded(
                         child: _Stat(
-                            'Today', Formatters.kwh(_usage?.todayKwh ?? 0)),
+                          'Today',
+                          Formatters.kwh(_usage?.todayKwh ?? 0),
+                        ),
                       ),
                       Expanded(
                         child: _Stat(
@@ -110,8 +114,10 @@ class _UnitDetailPageState extends State<UnitDetailPage> {
                     ],
                   ),
                   const SizedBox(height: EcoSpacing.lg),
-                  Text('Devices (${_devices.length})',
-                      style: context.textTheme.titleMedium),
+                  Text(
+                    'Devices (${_devices.length})',
+                    style: context.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: EcoSpacing.sm),
                   for (final d in _devices.take(8))
                     Card(
@@ -126,8 +132,10 @@ class _UnitDetailPageState extends State<UnitDetailPage> {
                       ),
                     ),
                   const SizedBox(height: EcoSpacing.lg),
-                  Text('Open alerts (${openAlerts.length})',
-                      style: context.textTheme.titleMedium),
+                  Text(
+                    'Open alerts (${openAlerts.length})',
+                    style: context.textTheme.titleMedium,
+                  ),
                   const SizedBox(height: EcoSpacing.sm),
                   if (openAlerts.isEmpty)
                     const EmptyState(message: 'No open alerts')
@@ -159,9 +167,9 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        children: [
-          Text(value, style: context.textTheme.titleMedium),
-          Text(label, style: context.textTheme.labelMedium),
-        ],
-      );
+    children: [
+      Text(value, style: context.textTheme.titleMedium),
+      Text(label, style: context.textTheme.labelMedium),
+    ],
+  );
 }

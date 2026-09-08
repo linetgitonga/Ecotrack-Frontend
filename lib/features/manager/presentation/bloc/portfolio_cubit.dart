@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../data/remote/api/tierb_api.dart';
 import '../../../../domain/entities/alert.dart';
+import '../../../../domain/entities/device.dart';
 import '../../../../domain/entities/site.dart';
 import '../../../../domain/value_objects/money.dart';
 
@@ -28,11 +29,17 @@ class UnitRow extends Equatable {
   String get status => openAlerts > 0
       ? 'Attention'
       : site.isActive
-          ? 'OK'
-          : site.status;
+      ? 'OK'
+      : site.status;
 
   @override
-  List<Object?> get props => [site.id, liveWatts, todayKwh, monthCost, openAlerts];
+  List<Object?> get props => [
+    site.id,
+    liveWatts,
+    todayKwh,
+    monthCost,
+    openAlerts,
+  ];
 }
 
 class PortfolioState extends Equatable {
@@ -51,8 +58,7 @@ class PortfolioState extends Equatable {
   int get unitCount => units.length;
   double get totalWatts => units.fold(0, (s, u) => s + u.liveWatts);
   double get totalTodayKwh => units.fold(0, (s, u) => s + u.todayKwh);
-  Money get totalMonthCost =>
-      units.fold(Money.zero, (s, u) => s + u.monthCost);
+  Money get totalMonthCost => units.fold(Money.zero, (s, u) => s + u.monthCost);
   int get totalOpenAlerts => units.fold(0, (s, u) => s + u.openAlerts);
   int get unitsNeedingAttention =>
       units.where((u) => u.openAlerts > 0 || !u.site.isActive).length;
@@ -62,13 +68,12 @@ class PortfolioState extends Equatable {
     List<UnitRow>? units,
     List<({String siteLabel, AlertEvent alert})>? criticalAlerts,
     Object? error = _s,
-  }) =>
-      PortfolioState(
-        loading: loading ?? this.loading,
-        units: units ?? this.units,
-        criticalAlerts: criticalAlerts ?? this.criticalAlerts,
-        error: identical(error, _s) ? this.error : error as String?,
-      );
+  }) => PortfolioState(
+    loading: loading ?? this.loading,
+    units: units ?? this.units,
+    criticalAlerts: criticalAlerts ?? this.criticalAlerts,
+    error: identical(error, _s) ? this.error : error as String?,
+  );
 
   static const _s = Object();
 
@@ -104,26 +109,23 @@ class PortfolioCubit extends Cubit<PortfolioState> {
       final cost = (results[1] as dynamic).valueOrNull as CostSummary?;
       final alerts =
           (results[2] as dynamic).valueOrNull as List<AlertEvent>? ?? const [];
-      final open =
-          alerts.where((a) => a.status == AlertStatus.open).toList();
+      final open = alerts.where((a) => a.status == AlertStatus.open).toList();
 
-      rows.add(UnitRow(
-        site: site,
-        liveWatts: summary?.liveWatts ?? 0,
-        todayKwh: summary?.todayKwh ?? 0,
-        monthCost: cost?.monthToDate ?? Money.zero,
-        openAlerts: open.length,
-        estimated: cost?.isEstimated ?? true,
-      ));
+      rows.add(
+        UnitRow(
+          site: site,
+          liveWatts: summary?.liveWatts ?? 0,
+          todayKwh: summary?.todayKwh ?? 0,
+          monthCost: cost?.monthToDate ?? Money.zero,
+          openAlerts: open.length,
+          estimated: cost?.isEstimated ?? true,
+        ),
+      );
       for (final a in open.where((a) => a.severity == AlertSeverity.critical)) {
         critical.add((siteLabel: site.label, alert: a));
       }
     }
 
-    emit(PortfolioState(
-      loading: false,
-      units: rows,
-      criticalAlerts: critical,
-    ));
+    emit(PortfolioState(loading: false, units: rows, criticalAlerts: critical));
   }
 }

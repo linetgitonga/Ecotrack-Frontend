@@ -60,6 +60,7 @@ import '../features/devices/presentation/bloc/device_detail_cubit.dart'
 import '../features/devices/presentation/bloc/device_list_cubit.dart' as _i737;
 import '../features/home/presentation/bloc/home_dashboard_bloc.dart' as _i305;
 import '../features/insights/presentation/bloc/insights_cubit.dart' as _i537;
+import '../features/manager/presentation/bloc/portfolio_cubit.dart' as _i244;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -176,6 +177,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i537.InsightsCubit>(
       () => _i537.InsightsCubit(gh<_i258.TierBApi>()),
+    );
+    gh.factory<_i244.PortfolioCubit>(
+      () => _i244.PortfolioCubit(gh<_i258.TierBApi>()),
     );
     gh.lazySingleton<_i214.SyncCubit>(
       () => _i214.SyncCubit(gh<_i463.SyncDao>(), gh<_i869.SyncEngine>()),

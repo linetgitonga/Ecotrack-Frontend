@@ -84,10 +84,7 @@ class _Overview extends StatelessWidget {
           children: [
             _Metric('Live load', Formatters.watts(state.totalWatts)),
             _Metric('Today', Formatters.kwh(state.totalTodayKwh)),
-            _Metric(
-              'Month cost',
-              state.totalMonthCost.formattedWithEstimate,
-            ),
+            _Metric('Month cost', state.totalMonthCost.formattedWithEstimate),
             _Metric('Units', '${state.unitCount}'),
             _Metric('Open alerts', '${state.totalOpenAlerts}'),
             _Metric('Need attention', '${state.unitsNeedingAttention}'),
@@ -102,7 +99,10 @@ class _Overview extends StatelessWidget {
           for (final c in state.criticalAlerts)
             Card(
               child: ListTile(
-                leading: const Icon(Icons.error_outline, color: EcoColors.error),
+                leading: const Icon(
+                  Icons.error_outline,
+                  color: EcoColors.error,
+                ),
                 title: Text(c.alert.title),
                 subtitle: Text('${c.siteLabel} · ${c.alert.description}'),
               ),
@@ -162,7 +162,10 @@ class _Billing extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('This billing period', style: context.textTheme.labelMedium),
+                Text(
+                  'This billing period',
+                  style: context.textTheme.labelMedium,
+                ),
                 Text(
                   state.totalMonthCost.formattedWithEstimate,
                   style: context.textTheme.headlineMedium,
@@ -221,11 +224,15 @@ class _Maintenance extends StatelessWidget {
           for (final u in attention)
             Card(
               child: ListTile(
-                leading: const Icon(Icons.build_outlined,
-                    color: EcoColors.warning),
+                leading: const Icon(
+                  Icons.build_outlined,
+                  color: EcoColors.warning,
+                ),
                 title: Text(u.site.label),
-                subtitle: Text('${u.openAlerts} open alert'
-                    '${u.openAlerts == 1 ? '' : 's'}'),
+                subtitle: Text(
+                  '${u.openAlerts} open alert'
+                  '${u.openAlerts == 1 ? '' : 's'}',
+                ),
                 onTap: () => context.push(Routes.portfolioUnit(u.site.id)),
               ),
             ),
@@ -237,7 +244,8 @@ class _Maintenance extends StatelessWidget {
         ],
         const SizedBox(height: EcoSpacing.lg),
         OutlinedButton.icon(
-          onPressed: () => context.showSnack('Schedule maintenance — coming soon'),
+          onPressed: () =>
+              context.showSnack('Schedule maintenance — coming soon'),
           icon: const Icon(Icons.event),
           label: const Text('Schedule maintenance'),
         ),

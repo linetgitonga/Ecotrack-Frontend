@@ -17,8 +17,7 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = context.select((AuthBloc b) => b.user);
     final siteCount = context.select((SiteBloc b) => b.state.sites.length);
-    final canSeePortfolio =
-        siteCount > 1 && user?.role == Role.owner;
+    final canSeePortfolio = siteCount > 1 && user?.role == Role.owner;
 
     return Scaffold(
       appBar: AppBar(
