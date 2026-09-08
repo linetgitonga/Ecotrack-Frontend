@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/config/env_config.dart';
+import '../features/account/presentation/bloc/site_bloc.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/connectivity/presentation/bloc/connectivity_bloc.dart';
 import '../injection/injection.dart';
@@ -21,10 +22,14 @@ class EcoTrackApp extends StatelessWidget {
       providers: [
         BlocProvider.value(value: getIt<AuthBloc>()),
         BlocProvider.value(value: getIt<ConnectivityBloc>()),
+        BlocProvider.value(value: getIt<SiteBloc>()),
       ],
       child: Builder(
         builder: (context) {
-          final router = buildRouter(context.read<AuthBloc>());
+          final router = buildRouter(
+            context.read<AuthBloc>(),
+            context.read<SiteBloc>(),
+          );
           return MaterialApp.router(
             title: config.appName,
             debugShowCheckedModeBanner: !config.isProd,

@@ -39,8 +39,9 @@ void main() {
   setUp(() {
     repo = _MockRepo();
     session = _MockSession();
-    when(() => session.attach(onSessionLost: any(named: 'onSessionLost')))
-        .thenReturn(null);
+    when(
+      () => session.attach(onSessionLost: any(named: 'onSessionLost')),
+    ).thenReturn(null);
     when(session.scheduleProactiveRefresh).thenReturn(null);
     when(session.cancel).thenReturn(null);
   });
@@ -49,9 +50,9 @@ void main() {
 
   blocTest<AuthBloc, AuthState>(
     'AuthStarted with no stored session → Unauthenticated',
-    setUp: () => when(repo.restoreSession).thenAnswer(
-      (_) async => const Err(UnauthorizedFailure(message: 'none')),
-    ),
+    setUp: () => when(
+      repo.restoreSession,
+    ).thenAnswer((_) async => const Err(UnauthorizedFailure(message: 'none'))),
     build: build,
     act: (b) => b.add(const AuthStarted()),
     expect: () => [isA<AuthRestoring>(), isA<Unauthenticated>()],
@@ -59,8 +60,7 @@ void main() {
 
   blocTest<AuthBloc, AuthState>(
     'AuthStarted with a valid stored session → Authenticated',
-    setUp: () =>
-        when(repo.restoreSession).thenAnswer((_) async => Ok(_user)),
+    setUp: () => when(repo.restoreSession).thenAnswer((_) async => Ok(_user)),
     build: build,
     act: (b) => b.add(const AuthStarted()),
     expect: () => [isA<AuthRestoring>(), isA<Authenticated>()],
@@ -70,13 +70,16 @@ void main() {
   blocTest<AuthBloc, AuthState>(
     'happy path: request OTP → verify → Authenticated',
     setUp: () {
-      when(() => repo.requestOtp(any(), deviceName: any(named: 'deviceName')))
-          .thenAnswer((_) async => const Ok(_challenge));
-      when(() => repo.verifyOtp(
-            pendingToken: any(named: 'pendingToken'),
-            code: any(named: 'code'),
-            deviceName: any(named: 'deviceName'),
-          )).thenAnswer((_) async => Ok(_user));
+      when(
+        () => repo.requestOtp(any(), deviceName: any(named: 'deviceName')),
+      ).thenAnswer((_) async => const Ok(_challenge));
+      when(
+        () => repo.verifyOtp(
+          pendingToken: any(named: 'pendingToken'),
+          code: any(named: 'code'),
+          deviceName: any(named: 'deviceName'),
+        ),
+      ).thenAnswer((_) async => Ok(_user));
     },
     build: build,
     act: (b) async {
@@ -105,13 +108,16 @@ void main() {
   blocTest<AuthBloc, AuthState>(
     'wrong OTP → AuthFailure then back to OtpPending',
     setUp: () {
-      when(() => repo.requestOtp(any(), deviceName: any(named: 'deviceName')))
-          .thenAnswer((_) async => const Ok(_challenge));
-      when(() => repo.verifyOtp(
-            pendingToken: any(named: 'pendingToken'),
-            code: any(named: 'code'),
-            deviceName: any(named: 'deviceName'),
-          )).thenAnswer(
+      when(
+        () => repo.requestOtp(any(), deviceName: any(named: 'deviceName')),
+      ).thenAnswer((_) async => const Ok(_challenge));
+      when(
+        () => repo.verifyOtp(
+          pendingToken: any(named: 'pendingToken'),
+          code: any(named: 'code'),
+          deviceName: any(named: 'deviceName'),
+        ),
+      ).thenAnswer(
         (_) async => const Err(UnauthorizedFailure(message: 'bad code')),
       );
     },

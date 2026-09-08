@@ -3,10 +3,20 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/account/presentation/bloc/site_bloc.dart';
+import '../features/account/presentation/pages/account_page.dart';
+import '../features/account/presentation/pages/audit_log_page.dart';
+import '../features/account/presentation/pages/members_page.dart';
+import '../features/account/presentation/pages/onboarding_site_page.dart';
+import '../features/account/presentation/pages/profile_edit_page.dart';
+import '../features/account/presentation/pages/sessions_page.dart';
+import '../features/account/presentation/pages/site_form_page.dart';
+import '../features/account/presentation/pages/sites_page.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/otp_verify_page.dart';
 import '../features/home/presentation/pages/home_placeholder_page.dart';
+import '../features/shell/presentation/pages/root_shell.dart';
 import '../features/shell/presentation/pages/splash_page.dart';
 
 /// Route path constants — string-addressable so deep links and tests don't
@@ -35,37 +45,52 @@ abstract final class Routes {
   static const hub = '/account/hub';
 }
 
-/// Bridges a [Stream] to the [Listenable] `GoRouter.refreshListenable` wants.
+/// Bridges one or more [Stream]s to the [Listenable] `refreshListenable` wants.
 class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(Stream<dynamic> stream) {
+  GoRouterRefreshStream(List<Stream<dynamic>> streams) {
     notifyListeners();
-    _sub = stream.asBroadcastStream().listen((_) => notifyListeners());
+    for (final s in streams) {
+      _subs.add(s.asBroadcastStream().listen((_) => notifyListeners()));
+    }
   }
-  late final StreamSubscription<dynamic> _sub;
+  final _subs = <StreamSubscription<dynamic>>[];
 
   @override
   void dispose() {
-    _sub.cancel();
+    for (final s in _subs) {
+      s.cancel();
+    }
     super.dispose();
   }
 }
 
-GoRouter buildRouter(AuthBloc authBloc) {
-  return GoRouter(
-    initialLocation: Routes.splash,
-    refreshListenable: GoRouterRefreshStream(authBloc.stream),
-    redirect: (context, state) {
-      final s = authBloc.state;
-      final loc = state.matchedLocation;
+final _rootKey = GlobalKey<NavigatorState>();
 
-      final booting = s is AuthInitial || s is AuthRestoring;
-      final authed = s is Authenticated;
+GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
+  return GoRouter(
+    navigatorKey: _rootKey,
+    initialLocation: Routes.splash,
+    refreshListenable: GoRouterRefreshStream([
+      authBloc.stream,
+      siteBloc.stream,
+    ]),
+    redirect: (context, state) {
+      final a = authBloc.state;
+      final loc = state.matchedLocation;
+      final booting = a is AuthInitial || a is AuthRestoring;
+      final authed = a is Authenticated;
       final inAuthFlow = loc == Routes.login || loc == Routes.otp;
 
       if (booting) return loc == Routes.splash ? null : Routes.splash;
       if (!authed) return inAuthFlow ? null : Routes.login;
-      // authed:
-      if (inAuthFlow || loc == Routes.splash) return Routes.home;
+
+      final needsOnboarding = siteBloc.state.hasNoSites;
+      if (needsOnboarding) {
+        return loc == Routes.onboardingSite ? null : Routes.onboardingSite;
+      }
+      if (inAuthFlow || loc == Routes.splash || loc == Routes.onboardingSite) {
+        return Routes.home;
+      }
       return null;
     },
     routes: [
@@ -73,8 +98,96 @@ GoRouter buildRouter(AuthBloc authBloc) {
       GoRoute(path: Routes.login, builder: (_, _) => const LoginPage()),
       GoRoute(path: Routes.otp, builder: (_, _) => const OtpVerifyPage()),
       GoRoute(
-        path: Routes.home,
-        builder: (_, _) => const HomePlaceholderPage(),
+        path: Routes.onboardingSite,
+        builder: (_, _) => const OnboardingSitePage(),
+      ),
+      StatefulShellRoute.indexedStack(
+        builder: (_, _, shell) => RootShell(navigationShell: shell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.home,
+                builder: (_, _) => const HomePlaceholderPage(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.devices,
+                builder: (_, _) => const TabPlaceholder('Devices'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.insights,
+                builder: (_, _) => const TabPlaceholder('Insights'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.automation,
+                builder: (_, _) => const TabPlaceholder('Automation'),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.account,
+                builder: (_, _) => const AccountPage(),
+                routes: [
+                  GoRoute(
+                    path: 'sites',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const SitesPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        builder: (_, _) => const SiteFormPage(),
+                      ),
+                      GoRoute(
+                        path: ':siteId/edit',
+                        builder: (_, s) =>
+                            SiteFormPage(siteId: s.pathParameters['siteId']),
+                      ),
+                      GoRoute(
+                        path: ':siteId/members',
+                        builder: (_, s) =>
+                            MembersPage(siteId: s.pathParameters['siteId']!),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'sessions',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const SessionsPage(),
+                  ),
+                  GoRoute(
+                    path: 'preferences',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const ProfileEditPage(),
+                  ),
+                  GoRoute(
+                    path: 'audit',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const AuditLogPage(),
+                  ),
+                  GoRoute(
+                    path: 'privacy',
+                    parentNavigatorKey: _rootKey,
+                    builder: (_, _) => const TabPlaceholder('Privacy & data'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

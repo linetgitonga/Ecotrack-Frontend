@@ -29,13 +29,20 @@ import '../core/sync/outbox_processor.dart' as _i451;
 import '../core/sync/realtime_client.dart' as _i906;
 import '../core/sync/sync_engine.dart' as _i869;
 import '../data/local/database/app_database.dart' as _i130;
+import '../data/local/database/daos/site_dao.dart' as _i675;
 import '../data/local/database/daos/sync_dao.dart' as _i463;
 import '../data/local/preferences/app_preferences.dart' as _i372;
 import '../data/local/preferences/secure_storage.dart' as _i666;
 import '../data/remote/api/api_client.dart' as _i101;
+import '../data/remote/api/audit_api.dart' as _i897;
 import '../data/remote/api/auth_api.dart' as _i765;
 import '../data/remote/api/me_api.dart' as _i286;
+import '../data/remote/api/sites_api.dart' as _i334;
 import '../data/repositories/auth_repository.dart' as _i578;
+import '../data/repositories/site_repository.dart' as _i667;
+import '../features/account/presentation/bloc/members_cubit.dart' as _i869;
+import '../features/account/presentation/bloc/sessions_cubit.dart' as _i582;
+import '../features/account/presentation/bloc/site_bloc.dart' as _i25;
 import '../features/auth/presentation/bloc/auth_bloc.dart' as _i59;
 import '../features/connectivity/presentation/bloc/connectivity_bloc.dart'
     as _i612;
@@ -90,6 +97,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i895.Connectivity>(),
       ),
     );
+    gh.lazySingleton<_i675.SiteDao>(
+      () => _i675.SiteDao(gh<_i130.AppDatabase>()),
+    );
     gh.lazySingleton<_i463.SyncDao>(
       () => _i463.SyncDao(gh<_i130.AppDatabase>()),
     );
@@ -117,14 +127,37 @@ extension GetItInjectableX on _i174.GetIt {
       () => networkModule.cloudApiClient(gh<_i361.Dio>(instanceName: 'cloud')),
       instanceName: 'cloud',
     );
+    gh.lazySingleton<_i897.AuditApi>(
+      () => _i897.AuditApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
+    );
     gh.lazySingleton<_i765.AuthApi>(
       () => _i765.AuthApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
     );
     gh.lazySingleton<_i286.MeApi>(
       () => _i286.MeApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
     );
+    gh.lazySingleton<_i334.SitesApi>(
+      () => _i334.SitesApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
+    );
     gh.lazySingleton<_i4.StepUpController>(
       () => _i4.StepUpController(gh<_i765.AuthApi>()),
+    );
+    gh.lazySingleton<_i667.SiteRepository>(
+      () => _i667.SiteRepository(
+        gh<_i334.SitesApi>(),
+        gh<_i675.SiteDao>(),
+        gh<_i463.SyncDao>(),
+      ),
+    );
+    gh.lazySingleton<_i25.SiteBloc>(
+      () =>
+          _i25.SiteBloc(gh<_i667.SiteRepository>(), gh<_i372.AppPreferences>()),
+    );
+    gh.factory<_i869.MembersCubit>(
+      () => _i869.MembersCubit(
+        gh<_i667.SiteRepository>(),
+        gh<_i4.StepUpController>(),
+      ),
     );
     gh.lazySingleton<_i538.SessionManager>(
       () => _i538.SessionManager(
@@ -141,6 +174,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i130.AppDatabase>(),
         gh<_i372.AppPreferences>(),
       ),
+    );
+    gh.factory<_i582.SessionsCubit>(
+      () => _i582.SessionsCubit(gh<_i578.AuthRepository>()),
     );
     gh.lazySingleton<_i59.AuthBloc>(
       () =>
