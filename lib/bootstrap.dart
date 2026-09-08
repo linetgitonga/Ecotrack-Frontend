@@ -7,6 +7,7 @@ import 'app/app.dart';
 import 'core/config/env_config.dart';
 import 'core/connectivity/connection_manager.dart';
 import 'core/sync/sync_engine.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'injection/injection.dart';
 
 /// Per-environment dotenv asset filename.
@@ -62,6 +63,10 @@ Future<void> bootstrap(Environment environment) async {
   // Start the connection state machine + sync engine (non-blocking).
   unawaited(getIt<ConnectionManager>().start());
   getIt<SyncEngine>().start();
+
+  // Kick off session restore — the router shows a splash until it resolves.
+  // (AuthBloc's constructor also wires SessionManager into the auth interceptor.)
+  getIt<AuthBloc>().add(const AuthStarted());
 
   FlutterError.onError = (details) {
     FlutterError.presentError(details);

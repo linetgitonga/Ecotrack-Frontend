@@ -18,6 +18,8 @@ import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 import 'package:uuid/uuid.dart' as _i706;
 
+import '../core/auth/session_manager.dart' as _i538;
+import '../core/auth/step_up_controller.dart' as _i4;
 import '../core/auth/token_store.dart' as _i906;
 import '../core/connectivity/connection_manager.dart' as _i959;
 import '../core/connectivity/mdns_discovery.dart' as _i480;
@@ -31,6 +33,12 @@ import '../data/local/database/daos/sync_dao.dart' as _i463;
 import '../data/local/preferences/app_preferences.dart' as _i372;
 import '../data/local/preferences/secure_storage.dart' as _i666;
 import '../data/remote/api/api_client.dart' as _i101;
+import '../data/remote/api/auth_api.dart' as _i765;
+import '../data/remote/api/me_api.dart' as _i286;
+import '../data/repositories/auth_repository.dart' as _i578;
+import '../features/auth/presentation/bloc/auth_bloc.dart' as _i59;
+import '../features/connectivity/presentation/bloc/connectivity_bloc.dart'
+    as _i612;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -92,6 +100,9 @@ extension GetItInjectableX on _i174.GetIt {
       ),
       instanceName: 'cloud',
     );
+    gh.lazySingleton<_i612.ConnectivityBloc>(
+      () => _i612.ConnectivityBloc(gh<_i959.ConnectionManager>()),
+    );
     gh.lazySingleton<_i451.OutboxProcessor>(
       () => _i451.OutboxProcessor(gh<_i130.AppDatabase>(), gh<_i463.SyncDao>()),
     );
@@ -105,6 +116,35 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i101.ApiClient>(
       () => networkModule.cloudApiClient(gh<_i361.Dio>(instanceName: 'cloud')),
       instanceName: 'cloud',
+    );
+    gh.lazySingleton<_i765.AuthApi>(
+      () => _i765.AuthApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
+    );
+    gh.lazySingleton<_i286.MeApi>(
+      () => _i286.MeApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
+    );
+    gh.lazySingleton<_i4.StepUpController>(
+      () => _i4.StepUpController(gh<_i765.AuthApi>()),
+    );
+    gh.lazySingleton<_i538.SessionManager>(
+      () => _i538.SessionManager(
+        gh<_i765.AuthApi>(),
+        gh<_i906.TokenStore>(),
+        gh<_i172.NetworkWiring>(),
+      ),
+    );
+    gh.lazySingleton<_i578.AuthRepository>(
+      () => _i578.AuthRepository(
+        gh<_i765.AuthApi>(),
+        gh<_i286.MeApi>(),
+        gh<_i906.TokenStore>(),
+        gh<_i130.AppDatabase>(),
+        gh<_i372.AppPreferences>(),
+      ),
+    );
+    gh.lazySingleton<_i59.AuthBloc>(
+      () =>
+          _i59.AuthBloc(gh<_i578.AuthRepository>(), gh<_i538.SessionManager>()),
     );
     return this;
   }

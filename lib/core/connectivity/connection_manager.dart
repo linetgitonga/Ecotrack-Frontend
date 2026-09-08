@@ -79,6 +79,12 @@ class ConnectionManager {
     if (_current.mode == ConnectionMode.lan) refresh();
   }
 
+  /// 'auto' | 'lan_only' | 'cloud_only' — persisted per-installation.
+  Future<void> setTransportPreference(String preference) async {
+    await _prefs.setPreferredTransport(preference);
+    await refresh();
+  }
+
   Future<EcoConnection> _resolve() async {
     if (!await _hasNetwork()) {
       return EcoConnection.offline(

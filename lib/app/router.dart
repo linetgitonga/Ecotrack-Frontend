@@ -1,9 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/presentation/bloc/auth_bloc.dart';
+import '../features/auth/presentation/pages/login_page.dart';
+import '../features/auth/presentation/pages/otp_verify_page.dart';
+import '../features/home/presentation/pages/home_placeholder_page.dart';
+import '../features/shell/presentation/pages/splash_page.dart';
+
 /// Route path constants — string-addressable so deep links and tests don't
-/// hard-code literals. The full route tree (shells, guards, feature blocs) is
-/// assembled in Phase 3 once `AuthBloc` exists.
+/// hard-code literals.
 abstract final class Routes {
   static const splash = '/';
   static const login = '/login';
@@ -28,22 +35,47 @@ abstract final class Routes {
   static const hub = '/account/hub';
 }
 
-/// Signature for the auth-aware redirect, supplied by Phase 3 from `AuthBloc`.
-typedef AuthRedirect =
-    String? Function(BuildContext context, GoRouterState state);
+/// Bridges a [Stream] to the [Listenable] `GoRouter.refreshListenable` wants.
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _sub = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+  late final StreamSubscription<dynamic> _sub;
 
-/// Builds the app router. Phase 1 exposes the shape; [redirect] and
-/// [refreshListenable] are injected later so routing reacts to auth changes.
-GoRouter buildRouter({
-  AuthRedirect? redirect,
-  Listenable? refreshListenable,
-  List<RouteBase> routes = const [],
-  String initialLocation = Routes.splash,
-}) {
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
+GoRouter buildRouter(AuthBloc authBloc) {
   return GoRouter(
-    initialLocation: initialLocation,
-    redirect: redirect,
-    refreshListenable: refreshListenable,
-    routes: routes,
+    initialLocation: Routes.splash,
+    refreshListenable: GoRouterRefreshStream(authBloc.stream),
+    redirect: (context, state) {
+      final s = authBloc.state;
+      final loc = state.matchedLocation;
+
+      final booting = s is AuthInitial || s is AuthRestoring;
+      final authed = s is Authenticated;
+      final inAuthFlow = loc == Routes.login || loc == Routes.otp;
+
+      if (booting) return loc == Routes.splash ? null : Routes.splash;
+      if (!authed) return inAuthFlow ? null : Routes.login;
+      // authed:
+      if (inAuthFlow || loc == Routes.splash) return Routes.home;
+      return null;
+    },
+    routes: [
+      GoRoute(path: Routes.splash, builder: (_, _) => const SplashPage()),
+      GoRoute(path: Routes.login, builder: (_, _) => const LoginPage()),
+      GoRoute(path: Routes.otp, builder: (_, _) => const OtpVerifyPage()),
+      GoRoute(
+        path: Routes.home,
+        builder: (_, _) => const HomePlaceholderPage(),
+      ),
+    ],
   );
 }
