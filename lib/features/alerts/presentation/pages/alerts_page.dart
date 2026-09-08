@@ -60,7 +60,10 @@ class _AlertsView extends StatelessWidget {
                   : null,
               child: TabBarView(
                 children: [
-                  _AlertList(items: state.byStatus(AlertStatus.open), state: state),
+                  _AlertList(
+                    items: state.byStatus(AlertStatus.open),
+                    state: state,
+                  ),
                   _AlertList(
                     items: state.byStatus(AlertStatus.acknowledged),
                     state: state,
@@ -98,10 +101,8 @@ class _AlertList extends StatelessWidget {
       padding: const EdgeInsets.all(EcoSpacing.lg),
       itemCount: items.length,
       separatorBuilder: (_, _) => const SizedBox(height: EcoSpacing.sm),
-      itemBuilder: (context, i) => _AlertCard(
-        alert: items[i],
-        busy: state.busyId == items[i].id,
-      ),
+      itemBuilder: (context, i) =>
+          _AlertCard(alert: items[i], busy: state.busyId == items[i].id),
     );
   }
 }
@@ -112,10 +113,10 @@ class _AlertCard extends StatelessWidget {
   final bool busy;
 
   (Color, IconData) get _visual => switch (alert.severity) {
-        AlertSeverity.critical => (EcoColors.error, Icons.error_outline),
-        AlertSeverity.warning => (EcoColors.warning, Icons.warning_amber_outlined),
-        AlertSeverity.info => (EcoColors.info, Icons.info_outline),
-      };
+    AlertSeverity.critical => (EcoColors.error, Icons.error_outline),
+    AlertSeverity.warning => (EcoColors.warning, Icons.warning_amber_outlined),
+    AlertSeverity.info => (EcoColors.info, Icons.info_outline),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -145,9 +146,9 @@ class _AlertCard extends StatelessWidget {
                     FilledButton.tonal(
                       onPressed: busy
                           ? null
-                          : () => context
-                              .read<AlertsCubit>()
-                              .acknowledge(alert.id),
+                          : () => context.read<AlertsCubit>().acknowledge(
+                              alert.id,
+                            ),
                       child: busy
                           ? const SizedBox(
                               height: 16,

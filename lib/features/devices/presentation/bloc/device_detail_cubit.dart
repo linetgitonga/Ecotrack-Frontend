@@ -29,14 +29,13 @@ class DeviceDetailState extends Equatable {
     List<double>? series,
     bool? busy,
     Object? error = _s,
-  }) =>
-      DeviceDetailState(
-        loading: loading ?? this.loading,
-        device: device ?? this.device,
-        series: series ?? this.series,
-        busy: busy ?? this.busy,
-        error: identical(error, _s) ? this.error : error as String?,
-      );
+  }) => DeviceDetailState(
+    loading: loading ?? this.loading,
+    device: device ?? this.device,
+    series: series ?? this.series,
+    busy: busy ?? this.busy,
+    error: identical(error, _s) ? this.error : error as String?,
+  );
 
   static const _s = Object();
 
@@ -57,15 +56,16 @@ class DeviceDetailCubit extends Cubit<DeviceDetailState> {
     final d = await _api.device(deviceId);
     final s = await _api.deviceSeries(deviceId);
     d.when(
-      ok: (device) => emit(state.copyWith(
-        loading: false,
-        device: device,
-        series: s.valueOrNull ?? const [],
-      )),
-      err: (f) => emit(state.copyWith(
-        loading: false,
-        error: ErrorMessages.forFailure(f),
-      )),
+      ok: (device) => emit(
+        state.copyWith(
+          loading: false,
+          device: device,
+          series: s.valueOrNull ?? const [],
+        ),
+      ),
+      err: (f) => emit(
+        state.copyWith(loading: false, error: ErrorMessages.forFailure(f)),
+      ),
     );
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 20), (_) => _refreshLive());
@@ -76,11 +76,15 @@ class DeviceDetailCubit extends Cubit<DeviceDetailState> {
     if (r.isErr) return;
     for (final d in r.valueOrNull!) {
       if (d.id == _id) {
-        emit(state.copyWith(device: state.device?.copyWith(
-          relayState: d.relayState,
-          watts: d.watts,
-          reachable: d.reachable,
-        )));
+        emit(
+          state.copyWith(
+            device: state.device?.copyWith(
+              relayState: d.relayState,
+              watts: d.watts,
+              reachable: d.reachable,
+            ),
+          ),
+        );
       }
     }
   }
@@ -89,16 +93,15 @@ class DeviceDetailCubit extends Cubit<DeviceDetailState> {
     final device = state.device;
     if (device == null) return;
     final next = !device.relayState;
-    emit(state.copyWith(
-      busy: true,
-      device: device.copyWith(relayState: next),
-    ));
+    emit(state.copyWith(busy: true, device: device.copyWith(relayState: next)));
     final r = await _api.sendCommand(device.id, on: next);
-    emit(state.copyWith(
-      busy: false,
-      device: r.isErr ? device.copyWith(relayState: !next) : null,
-      error: r.isErr ? ErrorMessages.forFailure(r.failureOrNull!) : null,
-    ));
+    emit(
+      state.copyWith(
+        busy: false,
+        device: r.isErr ? device.copyWith(relayState: !next) : null,
+        error: r.isErr ? ErrorMessages.forFailure(r.failureOrNull!) : null,
+      ),
+    );
   }
 
   @override

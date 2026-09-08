@@ -17,7 +17,7 @@ part 'home_dashboard_state.dart';
 @injectable
 class HomeDashboardBloc extends Bloc<HomeDashboardEvent, HomeDashboardState> {
   HomeDashboardBloc(this._api, this._devices)
-      : super(const HomeDashboardState()) {
+    : super(const HomeDashboardState()) {
     on<DashboardSubscribed>(_onSubscribed, transformer: restartable());
     on<DashboardRefreshed>(_onRefresh, transformer: droppable());
     on<DashboardLiveTick>(_onTick, transformer: droppable());

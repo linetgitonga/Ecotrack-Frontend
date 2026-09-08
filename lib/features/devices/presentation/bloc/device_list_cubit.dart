@@ -61,22 +61,28 @@ class DeviceListState extends Equatable {
     Object? error = _s,
     Set<String>? busyIds,
     Set<String>? queuedIds,
-  }) =>
-      DeviceListState(
-        loading: loading ?? this.loading,
-        devices: devices ?? this.devices,
-        filter: filter ?? this.filter,
-        query: query ?? this.query,
-        error: identical(error, _s) ? this.error : error as String?,
-        busyIds: busyIds ?? this.busyIds,
-        queuedIds: queuedIds ?? this.queuedIds,
-      );
+  }) => DeviceListState(
+    loading: loading ?? this.loading,
+    devices: devices ?? this.devices,
+    filter: filter ?? this.filter,
+    query: query ?? this.query,
+    error: identical(error, _s) ? this.error : error as String?,
+    busyIds: busyIds ?? this.busyIds,
+    queuedIds: queuedIds ?? this.queuedIds,
+  );
 
   static const _s = Object();
 
   @override
-  List<Object?> get props =>
-      [loading, devices, filter, query, error, busyIds, queuedIds];
+  List<Object?> get props => [
+    loading,
+    devices,
+    filter,
+    query,
+    error,
+    busyIds,
+    queuedIds,
+  ];
 }
 
 @injectable
@@ -109,13 +115,15 @@ class DeviceListCubit extends Cubit<DeviceListState> {
     final device = state.devices.firstWhere((d) => d.id == deviceId);
     emit(state.copyWith(busyIds: {...state.busyIds, deviceId}));
     final r = await _repo.setPower(deviceId, !device.relayState);
-    emit(state.copyWith(
-      busyIds: state.busyIds.where((id) => id != deviceId).toSet(),
-      queuedIds: r.valueOrNull == CommandOutcome.queued
-          ? {...state.queuedIds, deviceId}
-          : state.queuedIds.where((id) => id != deviceId).toSet(),
-      error: r.isErr ? ErrorMessages.forFailure(r.failureOrNull!) : null,
-    ));
+    emit(
+      state.copyWith(
+        busyIds: state.busyIds.where((id) => id != deviceId).toSet(),
+        queuedIds: r.valueOrNull == CommandOutcome.queued
+            ? {...state.queuedIds, deviceId}
+            : state.queuedIds.where((id) => id != deviceId).toSet(),
+        error: r.isErr ? ErrorMessages.forFailure(r.failureOrNull!) : null,
+      ),
+    );
   }
 
   @override

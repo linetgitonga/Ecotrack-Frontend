@@ -36,7 +36,8 @@ class _PairingPageState extends State<PairingPage> {
       _found.clear();
     });
     final hubs = await _api.hubs();
-    final hubId = hubs.valueOrNull?.firstOrNull?['hub_id']?.toString() ?? 'hub-1';
+    final hubId =
+        hubs.valueOrNull?.firstOrNull?['hub_id']?.toString() ?? 'hub-1';
     final opened = await _api.openPairing(hubId);
     if (opened.isErr) {
       setState(() {
@@ -110,13 +111,13 @@ class _PairingPageState extends State<PairingPage> {
                   e.isDone
                       ? Icons.check_circle
                       : e.isFailed
-                          ? Icons.error_outline
-                          : Icons.sync,
+                      ? Icons.error_outline
+                      : Icons.sync,
                   color: e.isDone
                       ? EcoColors.success
                       : e.isFailed
-                          ? EcoColors.error
-                          : EcoColors.secondary,
+                      ? EcoColors.error
+                      : EcoColors.secondary,
                 ),
                 title: Text(e.name),
                 subtitle: Text(_statusText(e.status)),
@@ -135,10 +136,10 @@ class _PairingPageState extends State<PairingPage> {
   }
 
   String _statusText(String status) => switch (status) {
-        'interviewing' => 'Interviewing the device…',
-        'joined' => 'Joined — configuring…',
-        'configured' => 'Ready to use',
-        'failed' => 'Pairing failed — move it closer and retry',
-        _ => 'Discovered',
-      };
+    'interviewing' => 'Interviewing the device…',
+    'joined' => 'Joined — configuring…',
+    'configured' => 'Ready to use',
+    'failed' => 'Pairing failed — move it closer and retry',
+    _ => 'Discovered',
+  };
 }

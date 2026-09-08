@@ -69,9 +69,14 @@ class _AutomationView extends StatelessWidget {
                   emptyMessage: 'No schedules yet',
                   items: [
                     for (final s in state.schedules)
-                      _Row(title: s.name, subtitle: s.summary, enabled: s.enabled),
+                      _Row(
+                        title: s.name,
+                        subtitle: s.summary,
+                        enabled: s.enabled,
+                      ),
                   ],
-                  onAdd: () => context.showSnack('Schedule editor — coming soon'),
+                  onAdd: () =>
+                      context.showSnack('Schedule editor — coming soon'),
                 ),
                 const SizedBox(height: EcoSpacing.xl),
                 _ListSection(
@@ -79,7 +84,11 @@ class _AutomationView extends StatelessWidget {
                   emptyMessage: 'No rules yet',
                   items: [
                     for (final r in state.rules)
-                      _Row(title: r.name, subtitle: r.summary, enabled: r.enabled),
+                      _Row(
+                        title: r.name,
+                        subtitle: r.summary,
+                        enabled: r.enabled,
+                      ),
                   ],
                   onAdd: () => context.showSnack('Rule builder — coming soon'),
                 ),

@@ -21,6 +21,7 @@ class _OnboardingSitePageState extends State<OnboardingSitePage> {
   final _label = TextEditingController(text: 'My Home');
   String _meterType = 'prepaid';
   bool _saving = false;
+  bool _agreed = false;
 
   @override
   void dispose() {
@@ -30,6 +31,10 @@ class _OnboardingSitePageState extends State<OnboardingSitePage> {
 
   Future<void> _create() async {
     if (_formKey.currentState?.validate() != true) return;
+    if (!_agreed) {
+      context.showSnack('Please accept the Privacy Policy and Terms');
+      return;
+    }
     setState(() => _saving = true);
     context.read<SiteBloc>().add(
       SiteCreated({'label': _label.text.trim(), 'meter_type': _meterType}),
@@ -76,7 +81,19 @@ class _OnboardingSitePageState extends State<OnboardingSitePage> {
                 ],
                 onChanged: (v) => setState(() => _meterType = v ?? 'prepaid'),
               ),
-              const SizedBox(height: EcoSpacing.xl),
+              const SizedBox(height: EcoSpacing.lg),
+              CheckboxListTile(
+                value: _agreed,
+                onChanged: (v) => setState(() => _agreed = v ?? false),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  'I have read and agree to the Privacy Policy and Terms of '
+                  'Service.',
+                  style: context.textTheme.bodySmall,
+                ),
+              ),
+              const SizedBox(height: EcoSpacing.lg),
               FilledButton(
                 onPressed: _saving ? null : _create,
                 child: _saving

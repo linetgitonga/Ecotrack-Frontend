@@ -29,21 +29,26 @@ class InsightsState extends Equatable {
     List<double>? trend,
     List<Recommendation>? recommendations,
     Object? error = _s,
-  }) =>
-      InsightsState(
-        loading: loading ?? this.loading,
-        cost: cost ?? this.cost,
-        breakdown: breakdown ?? this.breakdown,
-        trend: trend ?? this.trend,
-        recommendations: recommendations ?? this.recommendations,
-        error: identical(error, _s) ? this.error : error as String?,
-      );
+  }) => InsightsState(
+    loading: loading ?? this.loading,
+    cost: cost ?? this.cost,
+    breakdown: breakdown ?? this.breakdown,
+    trend: trend ?? this.trend,
+    recommendations: recommendations ?? this.recommendations,
+    error: identical(error, _s) ? this.error : error as String?,
+  );
 
   static const _s = Object();
 
   @override
-  List<Object?> get props =>
-      [loading, cost, breakdown, trend, recommendations, error];
+  List<Object?> get props => [
+    loading,
+    cost,
+    breakdown,
+    trend,
+    recommendations,
+    error,
+  ];
 }
 
 @injectable
@@ -68,21 +73,28 @@ class InsightsCubit extends Cubit<InsightsState> {
     final trend =
         (results[2] as dynamic).valueOrNull as List<double>? ?? const [];
     final recs =
-        (results[3] as dynamic).valueOrNull as List<Recommendation>? ?? const [];
+        (results[3] as dynamic).valueOrNull as List<Recommendation>? ??
+        const [];
 
     if (cost == null && breakdown.isEmpty) {
-      emit(state.copyWith(
-        loading: false,
-        error: ErrorMessages.forFailure((results[0] as dynamic).failureOrNull),
-      ));
+      emit(
+        state.copyWith(
+          loading: false,
+          error: ErrorMessages.forFailure(
+            (results[0] as dynamic).failureOrNull,
+          ),
+        ),
+      );
       return;
     }
-    emit(InsightsState(
-      loading: false,
-      cost: cost,
-      breakdown: breakdown,
-      trend: trend,
-      recommendations: recs,
-    ));
+    emit(
+      InsightsState(
+        loading: false,
+        cost: cost,
+        breakdown: breakdown,
+        trend: trend,
+        recommendations: recs,
+      ),
+    );
   }
 }

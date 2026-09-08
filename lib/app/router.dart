@@ -6,7 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../features/account/presentation/bloc/site_bloc.dart';
 import '../features/account/presentation/pages/account_page.dart';
 import '../features/account/presentation/pages/audit_log_page.dart';
+import '../features/account/presentation/pages/legal_doc_page.dart';
 import '../features/account/presentation/pages/members_page.dart';
+import '../features/account/presentation/pages/privacy_page.dart';
 import '../features/account/presentation/pages/onboarding_site_page.dart';
 import '../features/account/presentation/pages/profile_edit_page.dart';
 import '../features/account/presentation/pages/sessions_page.dart';
@@ -139,8 +141,9 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
                   GoRoute(
                     path: ':deviceId',
                     parentNavigatorKey: _rootKey,
-                    builder: (_, s) =>
-                        DeviceDetailPage(deviceId: s.pathParameters['deviceId']!),
+                    builder: (_, s) => DeviceDetailPage(
+                      deviceId: s.pathParameters['deviceId']!,
+                    ),
                   ),
                 ],
               ),
@@ -207,7 +210,21 @@ GoRouter buildRouter(AuthBloc authBloc, SiteBloc siteBloc) {
                   GoRoute(
                     path: 'privacy',
                     parentNavigatorKey: _rootKey,
-                    builder: (_, _) => const TabPlaceholder('Privacy & data'),
+                    builder: (_, _) => const PrivacyPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'policy',
+                        parentNavigatorKey: _rootKey,
+                        builder: (_, _) =>
+                            const LegalDocPage(doc: LegalDoc.privacy),
+                      ),
+                      GoRoute(
+                        path: 'terms',
+                        parentNavigatorKey: _rootKey,
+                        builder: (_, _) =>
+                            const LegalDocPage(doc: LegalDoc.terms),
+                      ),
+                    ],
                   ),
                 ],
               ),

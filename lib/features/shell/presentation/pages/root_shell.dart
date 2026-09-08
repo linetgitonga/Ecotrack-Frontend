@@ -142,9 +142,9 @@ class _SyncBanner extends StatelessWidget {
                     child: Text(
                       syncing
                           ? 'Syncing ${state.pending} change'
-                              '${state.pending == 1 ? '' : 's'}…'
+                                '${state.pending == 1 ? '' : 's'}…'
                           : '${state.pending} change'
-                              '${state.pending == 1 ? '' : 's'} waiting to sync',
+                                '${state.pending == 1 ? '' : 's'} waiting to sync',
                       style: context.textTheme.labelMedium,
                     ),
                   ),

@@ -95,6 +95,15 @@ abstract final class MockFixtures {
     },
   ];
 
+  static final _consents = <String, bool>{
+    'service_delivery': true,
+    'occupancy_analytics': false,
+    'nilm_disaggregation': false,
+    'marketing': false,
+    'research_aggregate': false,
+    'third_party_sharing': false,
+  };
+
   static bool handles(RequestOptions o) {
     final p = o.path;
     return p.contains('/devices') ||
@@ -108,6 +117,10 @@ abstract final class MockFixtures {
         p.contains('/alerts') ||
         p.contains('/appliances') ||
         p.contains('/tariffs') ||
+        p.contains('/me/consents') ||
+        p.contains('/me/data-export') ||
+        p.contains('/me/data-erasure') ||
+        p.contains('/me/preferences') ||
         (p.contains('/sites/') && p.contains('/rooms')) ||
         p.contains('/hubs');
   }
@@ -200,6 +213,58 @@ abstract final class MockFixtures {
     }
     if (p.contains('/tariffs/current')) {
       return (200, _tariff());
+    }
+    if (p.contains('/me/consents/') && (m == 'PUT' || m == 'POST')) {
+      final purpose = p.split('/').last;
+      final granted = (o.data is Map)
+          ? (o.data as Map)['granted'] == true
+          : true;
+      _consents[purpose] = granted;
+      return (200, {'purpose': purpose, 'granted': granted});
+    }
+    if (p.endsWith('/me/consents')) {
+      return (
+        200,
+        _consents.entries
+            .map((e) => {'purpose': e.key, 'granted': e.value})
+            .toList(),
+      );
+    }
+    if (p.endsWith('/me/data-export')) {
+      return (
+        202,
+        {
+          'status': 'accepted',
+          'message':
+              'We will email a download link to your registered address within '
+              '30 days, as required by the Data Protection Act 2019.',
+        },
+      );
+    }
+    if (p.endsWith('/me/data-erasure') && m == 'POST') {
+      return (
+        202,
+        {
+          'status': 'accepted',
+          'message':
+              'Your erasure request has been logged. We will confirm by '
+              'SMS once complete.',
+        },
+      );
+    }
+    if (p.endsWith('/me/preferences')) {
+      return (
+        200,
+        {
+          'currency': 'KES',
+          'units_display': 'kwh_and_kes',
+          'quiet_hours_start': '22:00',
+          'quiet_hours_end': '06:00',
+          'channels': {'push': true, 'sms': false, 'email': false},
+          'notify_min_severity': 'warning',
+          'data_saver': false,
+        },
+      );
     }
     if (p.contains('/hubs') && p.endsWith('/pairing-mode') && m == 'POST') {
       _pairingOpenedAt = DateTime.now();
@@ -451,8 +516,8 @@ abstract final class MockFixtures {
     final status = since < 10
         ? 'interviewing'
         : since < 16
-            ? 'joined'
-            : 'configured';
+        ? 'joined'
+        : 'configured';
     return [
       {
         'device_id': 'd-new-plug',

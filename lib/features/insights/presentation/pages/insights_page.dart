@@ -52,13 +52,15 @@ class _InsightsView extends StatelessWidget {
           if (state.error != null && state.cost == null) {
             return ErrorStateView(
               message: state.error!,
-              onRetry: () =>
-                  siteId != null ? context.read<InsightsCubit>().load(siteId) : null,
+              onRetry: () => siteId != null
+                  ? context.read<InsightsCubit>().load(siteId)
+                  : null,
             );
           }
           return RefreshIndicator(
-            onRefresh: () async =>
-                siteId != null ? context.read<InsightsCubit>().load(siteId) : null,
+            onRefresh: () async => siteId != null
+                ? context.read<InsightsCubit>().load(siteId)
+                : null,
             child: ListView(
               padding: const EdgeInsets.all(EcoSpacing.lg),
               children: [
@@ -82,7 +84,10 @@ class _InsightsView extends StatelessWidget {
                 const SizedBox(height: EcoSpacing.lg),
                 _Section(
                   title: 'Spend trend (7 days)',
-                  child: UsageLineChart(values: state.trend, unitSuffix: ' KES'),
+                  child: UsageLineChart(
+                    values: state.trend,
+                    unitSuffix: ' KES',
+                  ),
                 ),
                 const SizedBox(height: EcoSpacing.lg),
                 _Section(
@@ -92,7 +97,9 @@ class _InsightsView extends StatelessWidget {
                       for (final r in state.recommendations)
                         Card(
                           child: ListTile(
-                            leading: const Icon(Icons.tips_and_updates_outlined),
+                            leading: const Icon(
+                              Icons.tips_and_updates_outlined,
+                            ),
                             title: Text(r.title),
                             subtitle: Text(r.detail),
                             trailing: r.estimatedSaving == null

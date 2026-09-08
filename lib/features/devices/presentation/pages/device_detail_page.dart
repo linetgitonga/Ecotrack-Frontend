@@ -57,7 +57,9 @@ class _DetailView extends StatelessWidget {
                           ? Icons.lightbulb
                           : Icons.power,
                       size: 56,
-                      color: d.isOn ? EcoColors.primary : context.colors.outline,
+                      color: d.isOn
+                          ? EcoColors.primary
+                          : context.colors.outline,
                     ),
                     const SizedBox(height: EcoSpacing.sm),
                     Text(d.statusLabel, style: context.textTheme.titleLarge),
@@ -72,10 +74,14 @@ class _DetailView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _Reading('Power', Formatters.watts(d.watts)),
-                      _Reading('Voltage',
-                          d.volts == null ? '—' : Formatters.volts(d.volts!)),
-                      _Reading('Current',
-                          d.amps == null ? '—' : Formatters.amps(d.amps!)),
+                      _Reading(
+                        'Voltage',
+                        d.volts == null ? '—' : Formatters.volts(d.volts!),
+                      ),
+                      _Reading(
+                        'Current',
+                        d.amps == null ? '—' : Formatters.amps(d.amps!),
+                      ),
                     ],
                   ),
                 ),
@@ -85,9 +91,11 @@ class _DetailView extends StatelessWidget {
                 Card(
                   child: SwitchListTile(
                     title: const Text('Power'),
-                    subtitle: Text(d.reachable
-                        ? (d.isOn ? 'On' : 'Off')
-                        : 'Unreachable — check the wall switch'),
+                    subtitle: Text(
+                      d.reachable
+                          ? (d.isOn ? 'On' : 'Off')
+                          : 'Unreachable — check the wall switch',
+                    ),
                     value: d.isOn,
                     onChanged: state.busy || !d.reachable
                         ? null
@@ -131,11 +139,11 @@ class _Reading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        children: [
-          Text(value, style: context.textTheme.titleMedium),
-          Text(label, style: context.textTheme.labelMedium),
-        ],
-      );
+    children: [
+      Text(value, style: context.textTheme.titleMedium),
+      Text(label, style: context.textTheme.labelMedium),
+    ],
+  );
 }
 
 class _StubTile extends StatelessWidget {
@@ -150,10 +158,10 @@ class _StubTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        child: ListTile(
-          leading: Icon(icon),
-          title: Text(title),
-          subtitle: Text(subtitle),
-        ),
-      );
+    child: ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      subtitle: Text(subtitle),
+    ),
+  );
 }

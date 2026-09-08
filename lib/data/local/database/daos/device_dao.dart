@@ -20,9 +20,9 @@ class DeviceDao extends DatabaseAccessor<AppDatabase> with _$DeviceDaoMixin {
   Future<List<CachedDevice>> devices(String siteId) =>
       (select(cachedDevices)..where((t) => t.siteId.equals(siteId))).get();
 
-  Stream<CachedDevice?> watchDevice(String id) =>
-      (select(cachedDevices)..where((t) => t.id.equals(id)))
-          .watchSingleOrNull();
+  Stream<CachedDevice?> watchDevice(String id) => (select(
+    cachedDevices,
+  )..where((t) => t.id.equals(id))).watchSingleOrNull();
 
   Future<void> replaceForSite(
     String siteId,
@@ -55,15 +55,17 @@ class DeviceDao extends DatabaseAccessor<AppDatabase> with _$DeviceDaoMixin {
   }
 
   /// Optimistic local flip for a queued command.
-  Future<void> setRelay(String id, bool on) => (update(cachedDevices)
-        ..where((t) => t.id.equals(id)))
-      .write(CachedDevicesCompanion(relayState: Value(on)));
+  Future<void> setRelay(String id, bool on) =>
+      (update(cachedDevices)..where((t) => t.id.equals(id))).write(
+        CachedDevicesCompanion(relayState: Value(on)),
+      );
 
   Future<void> upsertRollups(List<CachedRollupsCompanion> rows) =>
       batch((b) => b.insertAllOnConflictUpdate(cachedRollups, rows));
 
-  Future<List<CachedRollup>> rollups(String deviceId) => (select(cachedRollups)
-        ..where((t) => t.deviceId.equals(deviceId))
-        ..orderBy([(t) => OrderingTerm.asc(t.hour)]))
-      .get();
+  Future<List<CachedRollup>> rollups(String deviceId) =>
+      (select(cachedRollups)
+            ..where((t) => t.deviceId.equals(deviceId))
+            ..orderBy([(t) => OrderingTerm.asc(t.hour)]))
+          .get();
 }

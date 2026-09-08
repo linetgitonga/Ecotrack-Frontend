@@ -34,6 +34,7 @@ import '../data/local/database/daos/site_dao.dart' as _i675;
 import '../data/local/database/daos/sync_dao.dart' as _i463;
 import '../data/local/preferences/app_preferences.dart' as _i372;
 import '../data/local/preferences/secure_storage.dart' as _i666;
+import '../data/remote/api/account_api.dart' as _i484;
 import '../data/remote/api/api_client.dart' as _i101;
 import '../data/remote/api/audit_api.dart' as _i897;
 import '../data/remote/api/auth_api.dart' as _i765;
@@ -43,6 +44,7 @@ import '../data/remote/api/tierb_api.dart' as _i258;
 import '../data/repositories/auth_repository.dart' as _i578;
 import '../data/repositories/device_repository.dart' as _i176;
 import '../data/repositories/site_repository.dart' as _i667;
+import '../features/account/presentation/bloc/consent_cubit.dart' as _i100;
 import '../features/account/presentation/bloc/members_cubit.dart' as _i869;
 import '../features/account/presentation/bloc/sessions_cubit.dart' as _i582;
 import '../features/account/presentation/bloc/site_bloc.dart' as _i25;
@@ -142,6 +144,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => networkModule.cloudApiClient(gh<_i361.Dio>(instanceName: 'cloud')),
       instanceName: 'cloud',
     );
+    gh.lazySingleton<_i484.AccountApi>(
+      () => _i484.AccountApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
+    );
     gh.lazySingleton<_i897.AuditApi>(
       () => _i897.AuditApi(gh<_i101.ApiClient>(instanceName: 'cloud')),
     );
@@ -174,6 +179,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i214.SyncCubit>(
       () => _i214.SyncCubit(gh<_i463.SyncDao>(), gh<_i869.SyncEngine>()),
+    );
+    gh.factory<_i100.ConsentCubit>(
+      () => _i100.ConsentCubit(
+        gh<_i484.AccountApi>(),
+        gh<_i4.StepUpController>(),
+      ),
     );
     gh.lazySingleton<_i667.SiteRepository>(
       () => _i667.SiteRepository(

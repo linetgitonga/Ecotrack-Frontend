@@ -23,8 +23,8 @@ class SyncViewState extends Equatable {
 class SyncCubit extends Cubit<SyncViewState> {
   SyncCubit(this._dao, this._engine) : super(const SyncViewState()) {
     _pendingSub = _dao.watchPendingCount().listen(
-          (n) => emit(SyncViewState(pending: n, status: state.status)),
-        );
+      (n) => emit(SyncViewState(pending: n, status: state.status)),
+    );
     _statusSub = _engine.status.listen(
       (s) => emit(SyncViewState(pending: state.pending, status: s)),
     );

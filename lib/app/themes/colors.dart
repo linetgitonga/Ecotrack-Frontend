@@ -38,6 +38,8 @@ abstract final class EcoColors {
   // --- Elevation ----------------------------------------------------------
   static const Color cardShadow = Color(0x14000000); // rgba(0,0,0,0.08)
 
-  /// On-colour for filled brand/semantic surfaces (meets AA on all of them).
+  /// On-colour for filled brand/semantic surfaces. White works on primary,
+  /// secondary and error; the amber [warning] needs dark text — use [onWarning].
   static const Color onFilled = Color(0xFFFFFFFF);
+  static const Color onWarning = Color(0xFF1A1A2E);
 }

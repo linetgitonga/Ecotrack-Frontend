@@ -28,7 +28,10 @@ class UsageLineChart extends StatelessWidget {
       return SizedBox(
         height: height,
         child: Center(
-          child: Text('Not enough data yet', style: context.textTheme.bodySmall),
+          child: Text(
+            'Not enough data yet',
+            style: context.textTheme.bodySmall,
+          ),
         ),
       );
     }
@@ -36,7 +39,8 @@ class UsageLineChart extends StatelessWidget {
     return SizedBox(
       height: height,
       child: Semantics(
-        label: 'Usage trend chart. Latest ${values.last.toStringAsFixed(0)}'
+        label:
+            'Usage trend chart. Latest ${values.last.toStringAsFixed(0)}'
             '$unitSuffix.',
         child: LineChart(
           LineChartData(
@@ -69,7 +73,10 @@ class UsageLineChart extends StatelessWidget {
                   getTitlesWidget: (v, _) {
                     final i = v.toInt();
                     if (i < 0 || i >= labels.length) return const SizedBox();
-                    return Text(labels[i], style: context.textTheme.labelMedium);
+                    return Text(
+                      labels[i],
+                      style: context.textTheme.labelMedium,
+                    );
                   },
                 ),
               ),
@@ -115,47 +122,51 @@ class ShareBars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var i = 0; i < rows.length; i++)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    rows[i].$1,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.textTheme.bodyMedium,
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: rows[i].$3.clamp(0, 1),
-                      minHeight: 10,
-                      backgroundColor: context.colors.surfaceContainerHighest,
-                      color: _palette[i % _palette.length],
+    return Semantics(
+      container: true,
+      label: 'Breakdown: ${rows.map((r) => '${r.$1} ${r.$2}').join(', ')}',
+      child: Column(
+        children: [
+          for (var i = 0; i < rows.length; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                      rows[i].$1,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodyMedium,
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    rows[i].$2,
-                    textAlign: TextAlign.end,
-                    style: context.textTheme.bodySmall,
+                  Expanded(
+                    flex: 5,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: rows[i].$3.clamp(0, 1),
+                        minHeight: 10,
+                        backgroundColor: context.colors.surfaceContainerHighest,
+                        color: _palette[i % _palette.length],
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      rows[i].$2,
+                      textAlign: TextAlign.end,
+                      style: context.textTheme.bodySmall,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }

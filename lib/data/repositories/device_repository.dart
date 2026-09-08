@@ -32,9 +32,7 @@ class DeviceRepository {
 
   Stream<List<Device>> watchDevices(String siteId) {
     _refresh(siteId); // fire and forget
-    return _dao.watchDevices(siteId).map(
-          (rows) => rows.map(_fromRow).toList(),
-        );
+    return _dao.watchDevices(siteId).map((rows) => rows.map(_fromRow).toList());
   }
 
   Stream<Device?> watchDevice(String id) =>
@@ -57,12 +55,14 @@ class DeviceRepository {
     final live = await _api.live(siteId);
     if (live.isOk) {
       await _dao.applyLive(
-        live.valueOrNull!.map((d) => (
-              id: d.id,
-              watts: d.watts,
-              relay: d.relayState,
-              reachable: d.reachable,
-            )),
+        live.valueOrNull!.map(
+          (d) => (
+            id: d.id,
+            watts: d.watts,
+            relay: d.relayState,
+            reachable: d.reachable,
+          ),
+        ),
       );
     }
   }
@@ -72,12 +72,14 @@ class DeviceRepository {
     final live = await _api.live(siteId);
     if (live.isErr) return;
     await _dao.applyLive(
-      live.valueOrNull!.map((d) => (
-            id: d.id,
-            watts: d.watts,
-            relay: d.relayState,
-            reachable: d.reachable,
-          )),
+      live.valueOrNull!.map(
+        (d) => (
+          id: d.id,
+          watts: d.watts,
+          relay: d.relayState,
+          reachable: d.reachable,
+        ),
+      ),
     );
   }
 
@@ -108,12 +110,12 @@ class DeviceRepository {
   }
 
   Future<void> _enqueue(String deviceId, bool on, String key) => _sync.enqueue(
-        kind: 'command',
-        priority: 20,
-        idempotencyKey: key,
-        payload: jsonEncode({'device_id': deviceId, 'on': on}),
-        expiresAt: DateTime.now().add(const Duration(minutes: 15)),
-      );
+    kind: 'command',
+    priority: 20,
+    idempotencyKey: key,
+    payload: jsonEncode({'device_id': deviceId, 'on': on}),
+    expiresAt: DateTime.now().add(const Duration(minutes: 15)),
+  );
 
   /// Outbox handler — registered with `OutboxProcessor` in `bootstrap`.
   Future<Result<void>> handleQueuedCommand(Map<String, dynamic> payload) {
@@ -124,19 +126,19 @@ class DeviceRepository {
   }
 
   Device _fromRow(CachedDevice r) => Device(
-        id: r.id,
-        name: r.name,
-        deviceClass: r.deviceClass,
-        relayState: r.relayState,
-        reachable: r.reachable,
-        roomId: r.roomId,
-        roomName: r.roomName,
-        watts: r.watts,
-        volts: r.volts,
-        amps: r.amps,
-        lastSeenAt: r.lastSeenAt,
-        switchable: r.switchable,
-      );
+    id: r.id,
+    name: r.name,
+    deviceClass: r.deviceClass,
+    relayState: r.relayState,
+    reachable: r.reachable,
+    roomId: r.roomId,
+    roomName: r.roomName,
+    watts: r.watts,
+    volts: r.volts,
+    amps: r.amps,
+    lastSeenAt: r.lastSeenAt,
+    switchable: r.switchable,
+  );
 
   CachedDevicesCompanion _companion(String siteId, Device d) =>
       CachedDevicesCompanion.insert(

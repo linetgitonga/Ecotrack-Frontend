@@ -183,7 +183,10 @@ class _DeviceRow extends StatelessWidget {
         title: Text(device.name),
         subtitle: Text(
           [
-            if (queued) 'Queued — will apply when online' else device.statusLabel,
+            if (queued)
+              'Queued — will apply when online'
+            else
+              device.statusLabel,
             if (!queued && device.reachable && device.isOn)
               Formatters.watts(device.watts),
             if (!queued && device.lastSeenAt != null)
@@ -196,11 +199,14 @@ class _DeviceRow extends StatelessWidget {
                 width: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : Switch(
-                value: device.isOn,
-                onChanged: device.reachable && device.switchable
-                    ? (_) => onToggle()
-                    : null,
+            : Semantics(
+                label: '${device.name} power, currently ${device.statusLabel}',
+                child: Switch(
+                  value: device.isOn,
+                  onChanged: device.reachable && device.switchable
+                      ? (_) => onToggle()
+                      : null,
+                ),
               ),
         onTap: () => context.push(Routes.device(device.id)),
       ),

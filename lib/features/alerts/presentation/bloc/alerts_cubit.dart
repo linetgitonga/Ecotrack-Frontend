@@ -30,13 +30,12 @@ class AlertsState extends Equatable {
     List<AlertEvent>? alerts,
     Object? error = _s,
     Object? busyId = _s,
-  }) =>
-      AlertsState(
-        loading: loading ?? this.loading,
-        alerts: alerts ?? this.alerts,
-        error: identical(error, _s) ? this.error : error as String?,
-        busyId: identical(busyId, _s) ? this.busyId : busyId as String?,
-      );
+  }) => AlertsState(
+    loading: loading ?? this.loading,
+    alerts: alerts ?? this.alerts,
+    error: identical(error, _s) ? this.error : error as String?,
+    busyId: identical(busyId, _s) ? this.busyId : busyId as String?,
+  );
 
   static const _s = Object();
 
@@ -56,10 +55,9 @@ class AlertsCubit extends Cubit<AlertsState> {
     final r = await _api.alerts(_siteId);
     r.when(
       ok: (a) => emit(AlertsState(loading: false, alerts: a)),
-      err: (f) => emit(state.copyWith(
-        loading: false,
-        error: ErrorMessages.forFailure(f),
-      )),
+      err: (f) => emit(
+        state.copyWith(loading: false, error: ErrorMessages.forFailure(f)),
+      ),
     );
   }
 
@@ -67,29 +65,33 @@ class AlertsCubit extends Cubit<AlertsState> {
     emit(state.copyWith(busyId: id));
     final r = await _api.acknowledgeAlert(id);
     if (r.isOk) {
-      emit(state.copyWith(
-        busyId: null,
-        alerts: [
-          for (final a in state.alerts)
-            a.id == id
-                ? AlertEvent(
-                    id: a.id,
-                    severity: a.severity,
-                    title: a.title,
-                    description: a.description,
-                    openedAt: a.openedAt,
-                    type: a.type,
-                    closedAt: a.closedAt,
-                    acknowledgedAt: DateTime.now(),
-                  )
-                : a,
-        ],
-      ));
+      emit(
+        state.copyWith(
+          busyId: null,
+          alerts: [
+            for (final a in state.alerts)
+              a.id == id
+                  ? AlertEvent(
+                      id: a.id,
+                      severity: a.severity,
+                      title: a.title,
+                      description: a.description,
+                      openedAt: a.openedAt,
+                      type: a.type,
+                      closedAt: a.closedAt,
+                      acknowledgedAt: DateTime.now(),
+                    )
+                  : a,
+          ],
+        ),
+      );
     } else {
-      emit(state.copyWith(
-        busyId: null,
-        error: ErrorMessages.forFailure(r.failureOrNull!),
-      ));
+      emit(
+        state.copyWith(
+          busyId: null,
+          error: ErrorMessages.forFailure(r.failureOrNull!),
+        ),
+      );
     }
   }
 }
