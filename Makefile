@@ -1,14 +1,21 @@
 # EcoTrack — developer shortcuts. `make help` lists targets.
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap env run-dev run-staging run-prod \
-        build-android build-ios test analyze format clean
+.PHONY: help bootstrap env gen gen-watch run-dev run-staging run-prod \
+        build-android build-ios build-web test analyze format clean
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 	 awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
-bootstrap: env ## First-time setup: env files + pub get
+bootstrap: env ## First-time setup: env files + pub get + codegen
 	flutter pub get
+	dart run build_runner build
+
+gen: ## Run code generation (drift / injectable / freezed / json)
+	dart run build_runner build
+
+gen-watch: ## Watch and regenerate on change
+	dart run build_runner watch
 
 env: ## Create local .env.* from the template (no-op if present)
 	@for e in dev staging prod; do \
@@ -29,6 +36,9 @@ build-android: ## Release App Bundle (prod)
 
 build-ios: ## Release IPA (prod, unsigned — signing handled by Fastlane match)
 	flutter build ios --flavor prod -t lib/main_prod.dart --release --no-codesign
+
+build-web: ## Release web build (dev entrypoint)
+	flutter build web --target lib/main_dev.dart --dart-define=FLAVOR=dev
 
 test: ## Unit + widget tests with coverage
 	flutter test --coverage

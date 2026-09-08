@@ -28,6 +28,13 @@ jobs:
           for e in dev staging prod; do cp .env.example ".env.$e"; done
 
       - run: flutter pub get
+
+      - name: Codegen (drift / injectable / freezed / json)
+        run: dart run build_runner build
+
+      - name: Generated files are up to date
+        run: git diff --exit-code -- '*.g.dart' '*.freezed.dart' '*.config.dart'
+
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
       - run: flutter test --coverage
@@ -51,4 +58,5 @@ jobs:
         with: { channel: stable, cache: true }
       - run: for e in dev staging prod; do cp .env.example ".env.$e"; done
       - run: flutter pub get
+      - run: dart run build_runner build
       - run: ${{ matrix.cmd }}

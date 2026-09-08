@@ -79,20 +79,32 @@ Automation, Alerts, all Building-Manager screens, all Super-Admin screens.
 tenant (the backend has `bootstrap_admin_tenant` + Django superusers with email/password — a
 *different auth path* the mobile OTP flow doesn't cover).
 
-**Proposed resolution (needs your confirmation):**
-1. App computes a `UserPersona` enum from `/me` + site count + a claim we ask backend to add
-   (`is_staff` / `persona`), falling back to: `owner` with >1 site ⇒ can see Manager UI;
-   otherwise Tenant UI.
-2. Super-Admin screens are **web-dashboard-only** for v1 (they're ops tooling; `System_Design`
-   agrees the web dashboard owns Admin). Mobile ships Tenant + a cut-down Manager view.
-3. Track "proper org/RBAC model" as a backend dependency; don't fake it client-side.
+**RESOLVED (Q1, 2026-09-08): adjust the design to match the backend.** No three-persona
+split. One app; features gated by **effective role** = narrower of `users.role` (from `/me`)
+and the per-site `site_members.role`:
 
-### 1.4 Assumptions I will build on unless you say otherwise
+| Role | Capability |
+|------|-----------|
+| `owner` | everything on their sites — device control, automation, members, subscription, meter/billing setup, site CRUD |
+| `member` | device control, modes, view insights/alerts; **no** member management, subscription, or site deletion |
+| `viewer` | read-only — dashboards, insights, alerts, device state; controls disabled with a reason |
+| `installer` | commissioning, calibration, hub diagnostics; other actions need step-up on sites they don't own |
 
-| A | Assumption |
+- `RoleGuard` / `context.can(Permission.x)` helper resolves capability from effective role;
+  every actuating control checks it and renders disabled + reason otherwise.
+- Multi-site owners get the `SiteSelector`; there is no distinct "Building Manager" UI — the
+  Manager wireframe screens (building rollup, units, billing) become an **owner-with-many-sites**
+  view reached from the site selector, built later (Phase 8) only if the endpoints exist.
+- **Super-Admin / ops screens are dropped from the mobile app.** They're internal tooling on a
+  separate auth path (Django superuser, email+password) — web dashboard or Django admin, not here.
+- `installer`/admin console (`System_Design §13.3`) is also out of mobile scope for v1.
+
+### 1.4 Decisions
+
+| A | Decision |
 |---|-----------|
-| A1 | v1 mobile scope = **Tenant persona complete** + **Manager persona read-mostly**. Super-Admin = web only. |
-| A2 | Tier B screens are built against the `System_Design §8` contract with a **local mock server** (`dart_frog` or a checked-in Prism/OpenAPI mock) so UI + BLoC + offline cache are real; swap base URL when backend ships. |
+| A1 | **v1 mobile scope = all end-user screens, role-gated** (§1.3). No Building-Manager / Super-Admin apps. Manager-style multi-site views deferred to Phase 8. |
+| A2 | **API-first (Q2, 2026-09-08).** Every repository calls the real endpoint at `api.ecotrack.co.ke/v1` per the `System_Design §8` / `backend_design.md` contracts first. A **mock layer is fallback only** — used when `EnvConfig.mockMode` is on (dev), or when a call returns 404/501 (endpoint not deployed yet). Mock responses live in `data/remote/mock/fixtures/` and match the documented JSON shapes exactly. The local drift cache is always the offline fallback beneath both. |
 | A3 | Base URLs: cloud `https://api.ecotrack.co.ke/v1`, staging/dev per flavor `.env`. LAN base derived from mDNS at runtime. |
 | A4 | Local DB = **drift** (SQLite; has a working web target). Not sqflite (no real web support). |
 | A5 | DI = **get_it + injectable**. Routing = **go_router**. Models = **freezed + json_serializable**. |

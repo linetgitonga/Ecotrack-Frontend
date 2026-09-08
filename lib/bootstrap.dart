@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'app.dart';
+import 'app/app.dart';
 import 'core/config/env_config.dart';
+import 'injection/injection.dart';
 
 /// Per-environment dotenv asset filename.
 const _dotenvFileByEnv = <Environment, String>{
@@ -18,17 +19,17 @@ const _dotenvFileByEnv = <Environment, String>{
 const _defaultsByEnv = <Environment, Map<String, String>>{
   Environment.dev: {
     'APP_NAME': 'EcoTrack Dev',
-    'API_BASE_URL': 'https://dev.api.ecotrack.app',
+    'API_BASE_URL': 'https://dev.api.ecotrack.co.ke/v1',
     'ENABLE_LOGGING': 'true',
   },
   Environment.staging: {
     'APP_NAME': 'EcoTrack Staging',
-    'API_BASE_URL': 'https://staging.api.ecotrack.app',
+    'API_BASE_URL': 'https://staging.api.ecotrack.co.ke/v1',
     'ENABLE_LOGGING': 'true',
   },
   Environment.prod: {
     'APP_NAME': 'EcoTrack',
-    'API_BASE_URL': 'https://api.ecotrack.app',
+    'API_BASE_URL': 'https://api.ecotrack.co.ke/v1',
     'ENABLE_LOGGING': 'false',
   },
 };
@@ -36,8 +37,8 @@ const _defaultsByEnv = <Environment, Map<String, String>>{
 /// Single shared startup path for every flavor.
 ///
 /// Each `main_<env>.dart` is a one-liner that calls this with its [environment].
-/// Keeps initialization order (bindings -> dotenv -> config -> error handlers ->
-/// runApp) identical across dev/staging/prod so bugs can't hide in a flavor.
+/// Keeps initialization order identical across dev/staging/prod so bugs can't
+/// hide in a flavor: bindings → dotenv → config → DI → error handlers → runApp.
 Future<void> bootstrap(Environment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -54,18 +55,17 @@ Future<void> bootstrap(Environment environment) async {
     defaults: _defaultsByEnv[environment]!,
   );
 
+  await configureDependencies(config);
+
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    // Hook point: forward to Crashlytics / Sentry when config.sentryDsn is set.
+    // Hook point: forward to crash reporting when config.sentryDsn is set.
   };
 
-  runZonedGuarded(
-    () => runApp(const EcoTrackApp()),
-    (error, stack) {
-      if (config.enableLogging) {
-        debugPrint('Uncaught zone error: $error\n$stack');
-      }
-      // Hook point: forward to crash reporting.
-    },
-  );
+  runZonedGuarded(() => runApp(const EcoTrackApp()), (error, stack) {
+    if (config.enableLogging) {
+      debugPrint('Uncaught zone error: $error\n$stack');
+    }
+    // Hook point: forward to crash reporting.
+  });
 }

@@ -1,0 +1,19 @@
+# Normalize line endings: LF in the repo, checked out as-is.
+* text=auto eol=lf
+
+# Binary assets — never touch.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.jks binary
+*.keystore binary
+
+# Generated Dart — keep in the repo, but collapse in diffs/reviews.
+*.g.dart linguist-generated=true
+*.freezed.dart linguist-generated=true
+*.config.dart linguist-generated=true
