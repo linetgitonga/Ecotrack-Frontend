@@ -148,6 +148,7 @@ class _GroupedList extends StatelessWidget {
               _DeviceRow(
                 device: d,
                 busy: state.busyIds.contains(d.id),
+                queued: state.queuedIds.contains(d.id),
                 onToggle: () => context.read<DeviceListCubit>().toggle(d.id),
               ),
             const SizedBox(height: EcoSpacing.md),
@@ -162,10 +163,12 @@ class _DeviceRow extends StatelessWidget {
   const _DeviceRow({
     required this.device,
     required this.busy,
+    required this.queued,
     required this.onToggle,
   });
   final Device device;
   final bool busy;
+  final bool queued;
   final VoidCallback onToggle;
 
   @override
@@ -180,9 +183,10 @@ class _DeviceRow extends StatelessWidget {
         title: Text(device.name),
         subtitle: Text(
           [
-            device.statusLabel,
-            if (device.reachable && device.isOn) Formatters.watts(device.watts),
-            if (device.lastSeenAt != null)
+            if (queued) 'Queued — will apply when online' else device.statusLabel,
+            if (!queued && device.reachable && device.isOn)
+              Formatters.watts(device.watts),
+            if (!queued && device.lastSeenAt != null)
               Formatters.relative(device.lastSeenAt!),
           ].join(' · '),
         ),

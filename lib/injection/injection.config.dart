@@ -29,6 +29,7 @@ import '../core/sync/outbox_processor.dart' as _i451;
 import '../core/sync/realtime_client.dart' as _i906;
 import '../core/sync/sync_engine.dart' as _i869;
 import '../data/local/database/app_database.dart' as _i130;
+import '../data/local/database/daos/device_dao.dart' as _i356;
 import '../data/local/database/daos/site_dao.dart' as _i675;
 import '../data/local/database/daos/sync_dao.dart' as _i463;
 import '../data/local/preferences/app_preferences.dart' as _i372;
@@ -40,6 +41,7 @@ import '../data/remote/api/me_api.dart' as _i286;
 import '../data/remote/api/sites_api.dart' as _i334;
 import '../data/remote/api/tierb_api.dart' as _i258;
 import '../data/repositories/auth_repository.dart' as _i578;
+import '../data/repositories/device_repository.dart' as _i176;
 import '../data/repositories/site_repository.dart' as _i667;
 import '../features/account/presentation/bloc/members_cubit.dart' as _i869;
 import '../features/account/presentation/bloc/sessions_cubit.dart' as _i582;
@@ -50,6 +52,7 @@ import '../features/automation/presentation/bloc/automation_cubit.dart'
     as _i307;
 import '../features/connectivity/presentation/bloc/connectivity_bloc.dart'
     as _i612;
+import '../features/connectivity/presentation/bloc/sync_cubit.dart' as _i214;
 import '../features/devices/presentation/bloc/device_detail_cubit.dart'
     as _i525;
 import '../features/devices/presentation/bloc/device_list_cubit.dart' as _i737;
@@ -105,6 +108,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i480.MdnsDiscovery>(),
         gh<_i895.Connectivity>(),
       ),
+    );
+    gh.lazySingleton<_i356.DeviceDao>(
+      () => _i356.DeviceDao(gh<_i130.AppDatabase>()),
     );
     gh.lazySingleton<_i675.SiteDao>(
       () => _i675.SiteDao(gh<_i130.AppDatabase>()),
@@ -163,14 +169,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i525.DeviceDetailCubit>(
       () => _i525.DeviceDetailCubit(gh<_i258.TierBApi>()),
     );
-    gh.factory<_i737.DeviceListCubit>(
-      () => _i737.DeviceListCubit(gh<_i258.TierBApi>()),
-    );
-    gh.factory<_i305.HomeDashboardBloc>(
-      () => _i305.HomeDashboardBloc(gh<_i258.TierBApi>()),
-    );
     gh.factory<_i537.InsightsCubit>(
       () => _i537.InsightsCubit(gh<_i258.TierBApi>()),
+    );
+    gh.lazySingleton<_i214.SyncCubit>(
+      () => _i214.SyncCubit(gh<_i463.SyncDao>(), gh<_i869.SyncEngine>()),
     );
     gh.lazySingleton<_i667.SiteRepository>(
       () => _i667.SiteRepository(
@@ -183,10 +186,25 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           _i25.SiteBloc(gh<_i667.SiteRepository>(), gh<_i372.AppPreferences>()),
     );
+    gh.lazySingleton<_i176.DeviceRepository>(
+      () => _i176.DeviceRepository(
+        gh<_i258.TierBApi>(),
+        gh<_i356.DeviceDao>(),
+        gh<_i463.SyncDao>(),
+        gh<_i959.ConnectionManager>(),
+        gh<_i706.Uuid>(),
+      ),
+    );
     gh.factory<_i869.MembersCubit>(
       () => _i869.MembersCubit(
         gh<_i667.SiteRepository>(),
         gh<_i4.StepUpController>(),
+      ),
+    );
+    gh.factory<_i305.HomeDashboardBloc>(
+      () => _i305.HomeDashboardBloc(
+        gh<_i258.TierBApi>(),
+        gh<_i176.DeviceRepository>(),
       ),
     );
     gh.lazySingleton<_i538.SessionManager>(
@@ -211,6 +229,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i59.AuthBloc>(
       () =>
           _i59.AuthBloc(gh<_i578.AuthRepository>(), gh<_i538.SessionManager>()),
+    );
+    gh.factory<_i737.DeviceListCubit>(
+      () => _i737.DeviceListCubit(gh<_i176.DeviceRepository>()),
     );
     return this;
   }

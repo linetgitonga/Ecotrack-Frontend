@@ -6,6 +6,7 @@ import '../core/config/env_config.dart';
 import '../features/account/presentation/bloc/site_bloc.dart';
 import '../features/auth/presentation/bloc/auth_bloc.dart';
 import '../features/connectivity/presentation/bloc/connectivity_bloc.dart';
+import '../features/connectivity/presentation/bloc/sync_cubit.dart';
 import '../injection/injection.dart';
 import 'router.dart';
 import 'themes/theme.dart';
@@ -23,6 +24,7 @@ class EcoTrackApp extends StatelessWidget {
         BlocProvider.value(value: getIt<AuthBloc>()),
         BlocProvider.value(value: getIt<ConnectivityBloc>()),
         BlocProvider.value(value: getIt<SiteBloc>()),
+        BlocProvider.value(value: getIt<SyncCubit>()),
       ],
       child: Builder(
         builder: (context) {

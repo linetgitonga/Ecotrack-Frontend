@@ -7,6 +7,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../core/constants/error_messages.dart';
 import '../../../../data/remote/api/tierb_api.dart';
+import '../../../../data/repositories/device_repository.dart';
 import '../../../../domain/entities/alert.dart';
 import '../../../../domain/entities/device.dart';
 
@@ -15,7 +16,8 @@ part 'home_dashboard_state.dart';
 
 @injectable
 class HomeDashboardBloc extends Bloc<HomeDashboardEvent, HomeDashboardState> {
-  HomeDashboardBloc(this._api) : super(const HomeDashboardState()) {
+  HomeDashboardBloc(this._api, this._devices)
+      : super(const HomeDashboardState()) {
     on<DashboardSubscribed>(_onSubscribed, transformer: restartable());
     on<DashboardRefreshed>(_onRefresh, transformer: droppable());
     on<DashboardLiveTick>(_onTick, transformer: droppable());
@@ -24,6 +26,7 @@ class HomeDashboardBloc extends Bloc<HomeDashboardEvent, HomeDashboardState> {
   }
 
   final TierBApi _api;
+  final DeviceRepository _devices;
   String _siteId = '';
   Timer? _timer;
 
@@ -105,7 +108,7 @@ class HomeDashboardBloc extends Bloc<HomeDashboardEvent, HomeDashboardState> {
         ],
       ),
     );
-    final r = await _api.sendCommand(e.deviceId, on: next);
+    final r = await _devices.setPower(e.deviceId, next);
     if (r.isErr) {
       emit(
         state.copyWith(

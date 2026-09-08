@@ -3653,6 +3653,1124 @@ class CachedSiteMembersCompanion extends UpdateCompanion<CachedSiteMember> {
   }
 }
 
+class $CachedDevicesTable extends CachedDevices
+    with TableInfo<$CachedDevicesTable, CachedDevice> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedDevicesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _siteIdMeta = const VerificationMeta('siteId');
+  @override
+  late final GeneratedColumn<String> siteId = GeneratedColumn<String>(
+    'site_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceClassMeta = const VerificationMeta(
+    'deviceClass',
+  );
+  @override
+  late final GeneratedColumn<String> deviceClass = GeneratedColumn<String>(
+    'device_class',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _roomIdMeta = const VerificationMeta('roomId');
+  @override
+  late final GeneratedColumn<String> roomId = GeneratedColumn<String>(
+    'room_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _roomNameMeta = const VerificationMeta(
+    'roomName',
+  );
+  @override
+  late final GeneratedColumn<String> roomName = GeneratedColumn<String>(
+    'room_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _relayStateMeta = const VerificationMeta(
+    'relayState',
+  );
+  @override
+  late final GeneratedColumn<bool> relayState = GeneratedColumn<bool>(
+    'relay_state',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("relay_state" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _reachableMeta = const VerificationMeta(
+    'reachable',
+  );
+  @override
+  late final GeneratedColumn<bool> reachable = GeneratedColumn<bool>(
+    'reachable',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("reachable" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _switchableMeta = const VerificationMeta(
+    'switchable',
+  );
+  @override
+  late final GeneratedColumn<bool> switchable = GeneratedColumn<bool>(
+    'switchable',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("switchable" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _wattsMeta = const VerificationMeta('watts');
+  @override
+  late final GeneratedColumn<double> watts = GeneratedColumn<double>(
+    'watts',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _voltsMeta = const VerificationMeta('volts');
+  @override
+  late final GeneratedColumn<double> volts = GeneratedColumn<double>(
+    'volts',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ampsMeta = const VerificationMeta('amps');
+  @override
+  late final GeneratedColumn<double> amps = GeneratedColumn<double>(
+    'amps',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastSeenAtMeta = const VerificationMeta(
+    'lastSeenAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lastSeenAt = GeneratedColumn<DateTime>(
+    'last_seen_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cachedAtMeta = const VerificationMeta(
+    'cachedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cachedAt = GeneratedColumn<DateTime>(
+    'cached_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    siteId,
+    name,
+    deviceClass,
+    roomId,
+    roomName,
+    relayState,
+    reachable,
+    switchable,
+    watts,
+    volts,
+    amps,
+    lastSeenAt,
+    cachedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_devices';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedDevice> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('site_id')) {
+      context.handle(
+        _siteIdMeta,
+        siteId.isAcceptableOrUnknown(data['site_id']!, _siteIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_siteIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('device_class')) {
+      context.handle(
+        _deviceClassMeta,
+        deviceClass.isAcceptableOrUnknown(
+          data['device_class']!,
+          _deviceClassMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceClassMeta);
+    }
+    if (data.containsKey('room_id')) {
+      context.handle(
+        _roomIdMeta,
+        roomId.isAcceptableOrUnknown(data['room_id']!, _roomIdMeta),
+      );
+    }
+    if (data.containsKey('room_name')) {
+      context.handle(
+        _roomNameMeta,
+        roomName.isAcceptableOrUnknown(data['room_name']!, _roomNameMeta),
+      );
+    }
+    if (data.containsKey('relay_state')) {
+      context.handle(
+        _relayStateMeta,
+        relayState.isAcceptableOrUnknown(data['relay_state']!, _relayStateMeta),
+      );
+    }
+    if (data.containsKey('reachable')) {
+      context.handle(
+        _reachableMeta,
+        reachable.isAcceptableOrUnknown(data['reachable']!, _reachableMeta),
+      );
+    }
+    if (data.containsKey('switchable')) {
+      context.handle(
+        _switchableMeta,
+        switchable.isAcceptableOrUnknown(data['switchable']!, _switchableMeta),
+      );
+    }
+    if (data.containsKey('watts')) {
+      context.handle(
+        _wattsMeta,
+        watts.isAcceptableOrUnknown(data['watts']!, _wattsMeta),
+      );
+    }
+    if (data.containsKey('volts')) {
+      context.handle(
+        _voltsMeta,
+        volts.isAcceptableOrUnknown(data['volts']!, _voltsMeta),
+      );
+    }
+    if (data.containsKey('amps')) {
+      context.handle(
+        _ampsMeta,
+        amps.isAcceptableOrUnknown(data['amps']!, _ampsMeta),
+      );
+    }
+    if (data.containsKey('last_seen_at')) {
+      context.handle(
+        _lastSeenAtMeta,
+        lastSeenAt.isAcceptableOrUnknown(
+          data['last_seen_at']!,
+          _lastSeenAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cached_at')) {
+      context.handle(
+        _cachedAtMeta,
+        cachedAt.isAcceptableOrUnknown(data['cached_at']!, _cachedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cachedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CachedDevice map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedDevice(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      siteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}site_id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      deviceClass: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_class'],
+      )!,
+      roomId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}room_id'],
+      ),
+      roomName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}room_name'],
+      ),
+      relayState: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}relay_state'],
+      )!,
+      reachable: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}reachable'],
+      )!,
+      switchable: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}switchable'],
+      )!,
+      watts: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}watts'],
+      )!,
+      volts: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}volts'],
+      ),
+      amps: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}amps'],
+      ),
+      lastSeenAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_seen_at'],
+      ),
+      cachedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cached_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CachedDevicesTable createAlias(String alias) {
+    return $CachedDevicesTable(attachedDatabase, alias);
+  }
+}
+
+class CachedDevice extends DataClass implements Insertable<CachedDevice> {
+  final String id;
+  final String siteId;
+  final String name;
+  final String deviceClass;
+  final String? roomId;
+  final String? roomName;
+  final bool relayState;
+  final bool reachable;
+  final bool switchable;
+  final double watts;
+  final double? volts;
+  final double? amps;
+  final DateTime? lastSeenAt;
+  final DateTime cachedAt;
+  const CachedDevice({
+    required this.id,
+    required this.siteId,
+    required this.name,
+    required this.deviceClass,
+    this.roomId,
+    this.roomName,
+    required this.relayState,
+    required this.reachable,
+    required this.switchable,
+    required this.watts,
+    this.volts,
+    this.amps,
+    this.lastSeenAt,
+    required this.cachedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['site_id'] = Variable<String>(siteId);
+    map['name'] = Variable<String>(name);
+    map['device_class'] = Variable<String>(deviceClass);
+    if (!nullToAbsent || roomId != null) {
+      map['room_id'] = Variable<String>(roomId);
+    }
+    if (!nullToAbsent || roomName != null) {
+      map['room_name'] = Variable<String>(roomName);
+    }
+    map['relay_state'] = Variable<bool>(relayState);
+    map['reachable'] = Variable<bool>(reachable);
+    map['switchable'] = Variable<bool>(switchable);
+    map['watts'] = Variable<double>(watts);
+    if (!nullToAbsent || volts != null) {
+      map['volts'] = Variable<double>(volts);
+    }
+    if (!nullToAbsent || amps != null) {
+      map['amps'] = Variable<double>(amps);
+    }
+    if (!nullToAbsent || lastSeenAt != null) {
+      map['last_seen_at'] = Variable<DateTime>(lastSeenAt);
+    }
+    map['cached_at'] = Variable<DateTime>(cachedAt);
+    return map;
+  }
+
+  CachedDevicesCompanion toCompanion(bool nullToAbsent) {
+    return CachedDevicesCompanion(
+      id: Value(id),
+      siteId: Value(siteId),
+      name: Value(name),
+      deviceClass: Value(deviceClass),
+      roomId: roomId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(roomId),
+      roomName: roomName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(roomName),
+      relayState: Value(relayState),
+      reachable: Value(reachable),
+      switchable: Value(switchable),
+      watts: Value(watts),
+      volts: volts == null && nullToAbsent
+          ? const Value.absent()
+          : Value(volts),
+      amps: amps == null && nullToAbsent ? const Value.absent() : Value(amps),
+      lastSeenAt: lastSeenAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastSeenAt),
+      cachedAt: Value(cachedAt),
+    );
+  }
+
+  factory CachedDevice.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedDevice(
+      id: serializer.fromJson<String>(json['id']),
+      siteId: serializer.fromJson<String>(json['siteId']),
+      name: serializer.fromJson<String>(json['name']),
+      deviceClass: serializer.fromJson<String>(json['deviceClass']),
+      roomId: serializer.fromJson<String?>(json['roomId']),
+      roomName: serializer.fromJson<String?>(json['roomName']),
+      relayState: serializer.fromJson<bool>(json['relayState']),
+      reachable: serializer.fromJson<bool>(json['reachable']),
+      switchable: serializer.fromJson<bool>(json['switchable']),
+      watts: serializer.fromJson<double>(json['watts']),
+      volts: serializer.fromJson<double?>(json['volts']),
+      amps: serializer.fromJson<double?>(json['amps']),
+      lastSeenAt: serializer.fromJson<DateTime?>(json['lastSeenAt']),
+      cachedAt: serializer.fromJson<DateTime>(json['cachedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'siteId': serializer.toJson<String>(siteId),
+      'name': serializer.toJson<String>(name),
+      'deviceClass': serializer.toJson<String>(deviceClass),
+      'roomId': serializer.toJson<String?>(roomId),
+      'roomName': serializer.toJson<String?>(roomName),
+      'relayState': serializer.toJson<bool>(relayState),
+      'reachable': serializer.toJson<bool>(reachable),
+      'switchable': serializer.toJson<bool>(switchable),
+      'watts': serializer.toJson<double>(watts),
+      'volts': serializer.toJson<double?>(volts),
+      'amps': serializer.toJson<double?>(amps),
+      'lastSeenAt': serializer.toJson<DateTime?>(lastSeenAt),
+      'cachedAt': serializer.toJson<DateTime>(cachedAt),
+    };
+  }
+
+  CachedDevice copyWith({
+    String? id,
+    String? siteId,
+    String? name,
+    String? deviceClass,
+    Value<String?> roomId = const Value.absent(),
+    Value<String?> roomName = const Value.absent(),
+    bool? relayState,
+    bool? reachable,
+    bool? switchable,
+    double? watts,
+    Value<double?> volts = const Value.absent(),
+    Value<double?> amps = const Value.absent(),
+    Value<DateTime?> lastSeenAt = const Value.absent(),
+    DateTime? cachedAt,
+  }) => CachedDevice(
+    id: id ?? this.id,
+    siteId: siteId ?? this.siteId,
+    name: name ?? this.name,
+    deviceClass: deviceClass ?? this.deviceClass,
+    roomId: roomId.present ? roomId.value : this.roomId,
+    roomName: roomName.present ? roomName.value : this.roomName,
+    relayState: relayState ?? this.relayState,
+    reachable: reachable ?? this.reachable,
+    switchable: switchable ?? this.switchable,
+    watts: watts ?? this.watts,
+    volts: volts.present ? volts.value : this.volts,
+    amps: amps.present ? amps.value : this.amps,
+    lastSeenAt: lastSeenAt.present ? lastSeenAt.value : this.lastSeenAt,
+    cachedAt: cachedAt ?? this.cachedAt,
+  );
+  CachedDevice copyWithCompanion(CachedDevicesCompanion data) {
+    return CachedDevice(
+      id: data.id.present ? data.id.value : this.id,
+      siteId: data.siteId.present ? data.siteId.value : this.siteId,
+      name: data.name.present ? data.name.value : this.name,
+      deviceClass: data.deviceClass.present
+          ? data.deviceClass.value
+          : this.deviceClass,
+      roomId: data.roomId.present ? data.roomId.value : this.roomId,
+      roomName: data.roomName.present ? data.roomName.value : this.roomName,
+      relayState: data.relayState.present
+          ? data.relayState.value
+          : this.relayState,
+      reachable: data.reachable.present ? data.reachable.value : this.reachable,
+      switchable: data.switchable.present
+          ? data.switchable.value
+          : this.switchable,
+      watts: data.watts.present ? data.watts.value : this.watts,
+      volts: data.volts.present ? data.volts.value : this.volts,
+      amps: data.amps.present ? data.amps.value : this.amps,
+      lastSeenAt: data.lastSeenAt.present
+          ? data.lastSeenAt.value
+          : this.lastSeenAt,
+      cachedAt: data.cachedAt.present ? data.cachedAt.value : this.cachedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedDevice(')
+          ..write('id: $id, ')
+          ..write('siteId: $siteId, ')
+          ..write('name: $name, ')
+          ..write('deviceClass: $deviceClass, ')
+          ..write('roomId: $roomId, ')
+          ..write('roomName: $roomName, ')
+          ..write('relayState: $relayState, ')
+          ..write('reachable: $reachable, ')
+          ..write('switchable: $switchable, ')
+          ..write('watts: $watts, ')
+          ..write('volts: $volts, ')
+          ..write('amps: $amps, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('cachedAt: $cachedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    siteId,
+    name,
+    deviceClass,
+    roomId,
+    roomName,
+    relayState,
+    reachable,
+    switchable,
+    watts,
+    volts,
+    amps,
+    lastSeenAt,
+    cachedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedDevice &&
+          other.id == this.id &&
+          other.siteId == this.siteId &&
+          other.name == this.name &&
+          other.deviceClass == this.deviceClass &&
+          other.roomId == this.roomId &&
+          other.roomName == this.roomName &&
+          other.relayState == this.relayState &&
+          other.reachable == this.reachable &&
+          other.switchable == this.switchable &&
+          other.watts == this.watts &&
+          other.volts == this.volts &&
+          other.amps == this.amps &&
+          other.lastSeenAt == this.lastSeenAt &&
+          other.cachedAt == this.cachedAt);
+}
+
+class CachedDevicesCompanion extends UpdateCompanion<CachedDevice> {
+  final Value<String> id;
+  final Value<String> siteId;
+  final Value<String> name;
+  final Value<String> deviceClass;
+  final Value<String?> roomId;
+  final Value<String?> roomName;
+  final Value<bool> relayState;
+  final Value<bool> reachable;
+  final Value<bool> switchable;
+  final Value<double> watts;
+  final Value<double?> volts;
+  final Value<double?> amps;
+  final Value<DateTime?> lastSeenAt;
+  final Value<DateTime> cachedAt;
+  final Value<int> rowid;
+  const CachedDevicesCompanion({
+    this.id = const Value.absent(),
+    this.siteId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.deviceClass = const Value.absent(),
+    this.roomId = const Value.absent(),
+    this.roomName = const Value.absent(),
+    this.relayState = const Value.absent(),
+    this.reachable = const Value.absent(),
+    this.switchable = const Value.absent(),
+    this.watts = const Value.absent(),
+    this.volts = const Value.absent(),
+    this.amps = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    this.cachedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedDevicesCompanion.insert({
+    required String id,
+    required String siteId,
+    required String name,
+    required String deviceClass,
+    this.roomId = const Value.absent(),
+    this.roomName = const Value.absent(),
+    this.relayState = const Value.absent(),
+    this.reachable = const Value.absent(),
+    this.switchable = const Value.absent(),
+    this.watts = const Value.absent(),
+    this.volts = const Value.absent(),
+    this.amps = const Value.absent(),
+    this.lastSeenAt = const Value.absent(),
+    required DateTime cachedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       siteId = Value(siteId),
+       name = Value(name),
+       deviceClass = Value(deviceClass),
+       cachedAt = Value(cachedAt);
+  static Insertable<CachedDevice> custom({
+    Expression<String>? id,
+    Expression<String>? siteId,
+    Expression<String>? name,
+    Expression<String>? deviceClass,
+    Expression<String>? roomId,
+    Expression<String>? roomName,
+    Expression<bool>? relayState,
+    Expression<bool>? reachable,
+    Expression<bool>? switchable,
+    Expression<double>? watts,
+    Expression<double>? volts,
+    Expression<double>? amps,
+    Expression<DateTime>? lastSeenAt,
+    Expression<DateTime>? cachedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (siteId != null) 'site_id': siteId,
+      if (name != null) 'name': name,
+      if (deviceClass != null) 'device_class': deviceClass,
+      if (roomId != null) 'room_id': roomId,
+      if (roomName != null) 'room_name': roomName,
+      if (relayState != null) 'relay_state': relayState,
+      if (reachable != null) 'reachable': reachable,
+      if (switchable != null) 'switchable': switchable,
+      if (watts != null) 'watts': watts,
+      if (volts != null) 'volts': volts,
+      if (amps != null) 'amps': amps,
+      if (lastSeenAt != null) 'last_seen_at': lastSeenAt,
+      if (cachedAt != null) 'cached_at': cachedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedDevicesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? siteId,
+    Value<String>? name,
+    Value<String>? deviceClass,
+    Value<String?>? roomId,
+    Value<String?>? roomName,
+    Value<bool>? relayState,
+    Value<bool>? reachable,
+    Value<bool>? switchable,
+    Value<double>? watts,
+    Value<double?>? volts,
+    Value<double?>? amps,
+    Value<DateTime?>? lastSeenAt,
+    Value<DateTime>? cachedAt,
+    Value<int>? rowid,
+  }) {
+    return CachedDevicesCompanion(
+      id: id ?? this.id,
+      siteId: siteId ?? this.siteId,
+      name: name ?? this.name,
+      deviceClass: deviceClass ?? this.deviceClass,
+      roomId: roomId ?? this.roomId,
+      roomName: roomName ?? this.roomName,
+      relayState: relayState ?? this.relayState,
+      reachable: reachable ?? this.reachable,
+      switchable: switchable ?? this.switchable,
+      watts: watts ?? this.watts,
+      volts: volts ?? this.volts,
+      amps: amps ?? this.amps,
+      lastSeenAt: lastSeenAt ?? this.lastSeenAt,
+      cachedAt: cachedAt ?? this.cachedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (siteId.present) {
+      map['site_id'] = Variable<String>(siteId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (deviceClass.present) {
+      map['device_class'] = Variable<String>(deviceClass.value);
+    }
+    if (roomId.present) {
+      map['room_id'] = Variable<String>(roomId.value);
+    }
+    if (roomName.present) {
+      map['room_name'] = Variable<String>(roomName.value);
+    }
+    if (relayState.present) {
+      map['relay_state'] = Variable<bool>(relayState.value);
+    }
+    if (reachable.present) {
+      map['reachable'] = Variable<bool>(reachable.value);
+    }
+    if (switchable.present) {
+      map['switchable'] = Variable<bool>(switchable.value);
+    }
+    if (watts.present) {
+      map['watts'] = Variable<double>(watts.value);
+    }
+    if (volts.present) {
+      map['volts'] = Variable<double>(volts.value);
+    }
+    if (amps.present) {
+      map['amps'] = Variable<double>(amps.value);
+    }
+    if (lastSeenAt.present) {
+      map['last_seen_at'] = Variable<DateTime>(lastSeenAt.value);
+    }
+    if (cachedAt.present) {
+      map['cached_at'] = Variable<DateTime>(cachedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedDevicesCompanion(')
+          ..write('id: $id, ')
+          ..write('siteId: $siteId, ')
+          ..write('name: $name, ')
+          ..write('deviceClass: $deviceClass, ')
+          ..write('roomId: $roomId, ')
+          ..write('roomName: $roomName, ')
+          ..write('relayState: $relayState, ')
+          ..write('reachable: $reachable, ')
+          ..write('switchable: $switchable, ')
+          ..write('watts: $watts, ')
+          ..write('volts: $volts, ')
+          ..write('amps: $amps, ')
+          ..write('lastSeenAt: $lastSeenAt, ')
+          ..write('cachedAt: $cachedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CachedRollupsTable extends CachedRollups
+    with TableInfo<$CachedRollupsTable, CachedRollup> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CachedRollupsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hourMeta = const VerificationMeta('hour');
+  @override
+  late final GeneratedColumn<DateTime> hour = GeneratedColumn<DateTime>(
+    'hour',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _energyWhMeta = const VerificationMeta(
+    'energyWh',
+  );
+  @override
+  late final GeneratedColumn<double> energyWh = GeneratedColumn<double>(
+    'energy_wh',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _avgWattsMeta = const VerificationMeta(
+    'avgWatts',
+  );
+  @override
+  late final GeneratedColumn<double> avgWatts = GeneratedColumn<double>(
+    'avg_watts',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [deviceId, hour, energyWh, avgWatts];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cached_rollups';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CachedRollup> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('hour')) {
+      context.handle(
+        _hourMeta,
+        hour.isAcceptableOrUnknown(data['hour']!, _hourMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_hourMeta);
+    }
+    if (data.containsKey('energy_wh')) {
+      context.handle(
+        _energyWhMeta,
+        energyWh.isAcceptableOrUnknown(data['energy_wh']!, _energyWhMeta),
+      );
+    }
+    if (data.containsKey('avg_watts')) {
+      context.handle(
+        _avgWattsMeta,
+        avgWatts.isAcceptableOrUnknown(data['avg_watts']!, _avgWattsMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {deviceId, hour};
+  @override
+  CachedRollup map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CachedRollup(
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      hour: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}hour'],
+      )!,
+      energyWh: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}energy_wh'],
+      )!,
+      avgWatts: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}avg_watts'],
+      ),
+    );
+  }
+
+  @override
+  $CachedRollupsTable createAlias(String alias) {
+    return $CachedRollupsTable(attachedDatabase, alias);
+  }
+}
+
+class CachedRollup extends DataClass implements Insertable<CachedRollup> {
+  final String deviceId;
+  final DateTime hour;
+  final double energyWh;
+  final double? avgWatts;
+  const CachedRollup({
+    required this.deviceId,
+    required this.hour,
+    required this.energyWh,
+    this.avgWatts,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['device_id'] = Variable<String>(deviceId);
+    map['hour'] = Variable<DateTime>(hour);
+    map['energy_wh'] = Variable<double>(energyWh);
+    if (!nullToAbsent || avgWatts != null) {
+      map['avg_watts'] = Variable<double>(avgWatts);
+    }
+    return map;
+  }
+
+  CachedRollupsCompanion toCompanion(bool nullToAbsent) {
+    return CachedRollupsCompanion(
+      deviceId: Value(deviceId),
+      hour: Value(hour),
+      energyWh: Value(energyWh),
+      avgWatts: avgWatts == null && nullToAbsent
+          ? const Value.absent()
+          : Value(avgWatts),
+    );
+  }
+
+  factory CachedRollup.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CachedRollup(
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      hour: serializer.fromJson<DateTime>(json['hour']),
+      energyWh: serializer.fromJson<double>(json['energyWh']),
+      avgWatts: serializer.fromJson<double?>(json['avgWatts']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'deviceId': serializer.toJson<String>(deviceId),
+      'hour': serializer.toJson<DateTime>(hour),
+      'energyWh': serializer.toJson<double>(energyWh),
+      'avgWatts': serializer.toJson<double?>(avgWatts),
+    };
+  }
+
+  CachedRollup copyWith({
+    String? deviceId,
+    DateTime? hour,
+    double? energyWh,
+    Value<double?> avgWatts = const Value.absent(),
+  }) => CachedRollup(
+    deviceId: deviceId ?? this.deviceId,
+    hour: hour ?? this.hour,
+    energyWh: energyWh ?? this.energyWh,
+    avgWatts: avgWatts.present ? avgWatts.value : this.avgWatts,
+  );
+  CachedRollup copyWithCompanion(CachedRollupsCompanion data) {
+    return CachedRollup(
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      hour: data.hour.present ? data.hour.value : this.hour,
+      energyWh: data.energyWh.present ? data.energyWh.value : this.energyWh,
+      avgWatts: data.avgWatts.present ? data.avgWatts.value : this.avgWatts,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedRollup(')
+          ..write('deviceId: $deviceId, ')
+          ..write('hour: $hour, ')
+          ..write('energyWh: $energyWh, ')
+          ..write('avgWatts: $avgWatts')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(deviceId, hour, energyWh, avgWatts);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CachedRollup &&
+          other.deviceId == this.deviceId &&
+          other.hour == this.hour &&
+          other.energyWh == this.energyWh &&
+          other.avgWatts == this.avgWatts);
+}
+
+class CachedRollupsCompanion extends UpdateCompanion<CachedRollup> {
+  final Value<String> deviceId;
+  final Value<DateTime> hour;
+  final Value<double> energyWh;
+  final Value<double?> avgWatts;
+  final Value<int> rowid;
+  const CachedRollupsCompanion({
+    this.deviceId = const Value.absent(),
+    this.hour = const Value.absent(),
+    this.energyWh = const Value.absent(),
+    this.avgWatts = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CachedRollupsCompanion.insert({
+    required String deviceId,
+    required DateTime hour,
+    this.energyWh = const Value.absent(),
+    this.avgWatts = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : deviceId = Value(deviceId),
+       hour = Value(hour);
+  static Insertable<CachedRollup> custom({
+    Expression<String>? deviceId,
+    Expression<DateTime>? hour,
+    Expression<double>? energyWh,
+    Expression<double>? avgWatts,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (deviceId != null) 'device_id': deviceId,
+      if (hour != null) 'hour': hour,
+      if (energyWh != null) 'energy_wh': energyWh,
+      if (avgWatts != null) 'avg_watts': avgWatts,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CachedRollupsCompanion copyWith({
+    Value<String>? deviceId,
+    Value<DateTime>? hour,
+    Value<double>? energyWh,
+    Value<double?>? avgWatts,
+    Value<int>? rowid,
+  }) {
+    return CachedRollupsCompanion(
+      deviceId: deviceId ?? this.deviceId,
+      hour: hour ?? this.hour,
+      energyWh: energyWh ?? this.energyWh,
+      avgWatts: avgWatts ?? this.avgWatts,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (hour.present) {
+      map['hour'] = Variable<DateTime>(hour.value);
+    }
+    if (energyWh.present) {
+      map['energy_wh'] = Variable<double>(energyWh.value);
+    }
+    if (avgWatts.present) {
+      map['avg_watts'] = Variable<double>(avgWatts.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CachedRollupsCompanion(')
+          ..write('deviceId: $deviceId, ')
+          ..write('hour: $hour, ')
+          ..write('energyWh: $energyWh, ')
+          ..write('avgWatts: $avgWatts, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3664,6 +4782,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CachedRoomsTable cachedRooms = $CachedRoomsTable(this);
   late final $CachedSiteMembersTable cachedSiteMembers =
       $CachedSiteMembersTable(this);
+  late final $CachedDevicesTable cachedDevices = $CachedDevicesTable(this);
+  late final $CachedRollupsTable cachedRollups = $CachedRollupsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3676,6 +4796,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     cachedSites,
     cachedRooms,
     cachedSiteMembers,
+    cachedDevices,
+    cachedRollups,
   ];
 }
 
@@ -5518,6 +6640,566 @@ typedef $$CachedSiteMembersTableProcessedTableManager =
       CachedSiteMember,
       PrefetchHooks Function()
     >;
+typedef $$CachedDevicesTableCreateCompanionBuilder =
+    CachedDevicesCompanion Function({
+      required String id,
+      required String siteId,
+      required String name,
+      required String deviceClass,
+      Value<String?> roomId,
+      Value<String?> roomName,
+      Value<bool> relayState,
+      Value<bool> reachable,
+      Value<bool> switchable,
+      Value<double> watts,
+      Value<double?> volts,
+      Value<double?> amps,
+      Value<DateTime?> lastSeenAt,
+      required DateTime cachedAt,
+      Value<int> rowid,
+    });
+typedef $$CachedDevicesTableUpdateCompanionBuilder =
+    CachedDevicesCompanion Function({
+      Value<String> id,
+      Value<String> siteId,
+      Value<String> name,
+      Value<String> deviceClass,
+      Value<String?> roomId,
+      Value<String?> roomName,
+      Value<bool> relayState,
+      Value<bool> reachable,
+      Value<bool> switchable,
+      Value<double> watts,
+      Value<double?> volts,
+      Value<double?> amps,
+      Value<DateTime?> lastSeenAt,
+      Value<DateTime> cachedAt,
+      Value<int> rowid,
+    });
+
+class $$CachedDevicesTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedDevicesTable> {
+  $$CachedDevicesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get siteId => $composableBuilder(
+    column: $table.siteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceClass => $composableBuilder(
+    column: $table.deviceClass,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get roomId => $composableBuilder(
+    column: $table.roomId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get roomName => $composableBuilder(
+    column: $table.roomName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get relayState => $composableBuilder(
+    column: $table.relayState,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get reachable => $composableBuilder(
+    column: $table.reachable,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get switchable => $composableBuilder(
+    column: $table.switchable,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get watts => $composableBuilder(
+    column: $table.watts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get volts => $composableBuilder(
+    column: $table.volts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get amps => $composableBuilder(
+    column: $table.amps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastSeenAt => $composableBuilder(
+    column: $table.lastSeenAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedDevicesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedDevicesTable> {
+  $$CachedDevicesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get siteId => $composableBuilder(
+    column: $table.siteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceClass => $composableBuilder(
+    column: $table.deviceClass,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get roomId => $composableBuilder(
+    column: $table.roomId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get roomName => $composableBuilder(
+    column: $table.roomName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get relayState => $composableBuilder(
+    column: $table.relayState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get reachable => $composableBuilder(
+    column: $table.reachable,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get switchable => $composableBuilder(
+    column: $table.switchable,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get watts => $composableBuilder(
+    column: $table.watts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get volts => $composableBuilder(
+    column: $table.volts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get amps => $composableBuilder(
+    column: $table.amps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastSeenAt => $composableBuilder(
+    column: $table.lastSeenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cachedAt => $composableBuilder(
+    column: $table.cachedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedDevicesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedDevicesTable> {
+  $$CachedDevicesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get siteId =>
+      $composableBuilder(column: $table.siteId, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceClass => $composableBuilder(
+    column: $table.deviceClass,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get roomId =>
+      $composableBuilder(column: $table.roomId, builder: (column) => column);
+
+  GeneratedColumn<String> get roomName =>
+      $composableBuilder(column: $table.roomName, builder: (column) => column);
+
+  GeneratedColumn<bool> get relayState => $composableBuilder(
+    column: $table.relayState,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get reachable =>
+      $composableBuilder(column: $table.reachable, builder: (column) => column);
+
+  GeneratedColumn<bool> get switchable => $composableBuilder(
+    column: $table.switchable,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<double> get watts =>
+      $composableBuilder(column: $table.watts, builder: (column) => column);
+
+  GeneratedColumn<double> get volts =>
+      $composableBuilder(column: $table.volts, builder: (column) => column);
+
+  GeneratedColumn<double> get amps =>
+      $composableBuilder(column: $table.amps, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastSeenAt => $composableBuilder(
+    column: $table.lastSeenAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cachedAt =>
+      $composableBuilder(column: $table.cachedAt, builder: (column) => column);
+}
+
+class $$CachedDevicesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedDevicesTable,
+          CachedDevice,
+          $$CachedDevicesTableFilterComposer,
+          $$CachedDevicesTableOrderingComposer,
+          $$CachedDevicesTableAnnotationComposer,
+          $$CachedDevicesTableCreateCompanionBuilder,
+          $$CachedDevicesTableUpdateCompanionBuilder,
+          (
+            CachedDevice,
+            BaseReferences<_$AppDatabase, $CachedDevicesTable, CachedDevice>,
+          ),
+          CachedDevice,
+          PrefetchHooks Function()
+        > {
+  $$CachedDevicesTableTableManager(_$AppDatabase db, $CachedDevicesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedDevicesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedDevicesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedDevicesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> siteId = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> deviceClass = const Value.absent(),
+                Value<String?> roomId = const Value.absent(),
+                Value<String?> roomName = const Value.absent(),
+                Value<bool> relayState = const Value.absent(),
+                Value<bool> reachable = const Value.absent(),
+                Value<bool> switchable = const Value.absent(),
+                Value<double> watts = const Value.absent(),
+                Value<double?> volts = const Value.absent(),
+                Value<double?> amps = const Value.absent(),
+                Value<DateTime?> lastSeenAt = const Value.absent(),
+                Value<DateTime> cachedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedDevicesCompanion(
+                id: id,
+                siteId: siteId,
+                name: name,
+                deviceClass: deviceClass,
+                roomId: roomId,
+                roomName: roomName,
+                relayState: relayState,
+                reachable: reachable,
+                switchable: switchable,
+                watts: watts,
+                volts: volts,
+                amps: amps,
+                lastSeenAt: lastSeenAt,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String siteId,
+                required String name,
+                required String deviceClass,
+                Value<String?> roomId = const Value.absent(),
+                Value<String?> roomName = const Value.absent(),
+                Value<bool> relayState = const Value.absent(),
+                Value<bool> reachable = const Value.absent(),
+                Value<bool> switchable = const Value.absent(),
+                Value<double> watts = const Value.absent(),
+                Value<double?> volts = const Value.absent(),
+                Value<double?> amps = const Value.absent(),
+                Value<DateTime?> lastSeenAt = const Value.absent(),
+                required DateTime cachedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CachedDevicesCompanion.insert(
+                id: id,
+                siteId: siteId,
+                name: name,
+                deviceClass: deviceClass,
+                roomId: roomId,
+                roomName: roomName,
+                relayState: relayState,
+                reachable: reachable,
+                switchable: switchable,
+                watts: watts,
+                volts: volts,
+                amps: amps,
+                lastSeenAt: lastSeenAt,
+                cachedAt: cachedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedDevicesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedDevicesTable,
+      CachedDevice,
+      $$CachedDevicesTableFilterComposer,
+      $$CachedDevicesTableOrderingComposer,
+      $$CachedDevicesTableAnnotationComposer,
+      $$CachedDevicesTableCreateCompanionBuilder,
+      $$CachedDevicesTableUpdateCompanionBuilder,
+      (
+        CachedDevice,
+        BaseReferences<_$AppDatabase, $CachedDevicesTable, CachedDevice>,
+      ),
+      CachedDevice,
+      PrefetchHooks Function()
+    >;
+typedef $$CachedRollupsTableCreateCompanionBuilder =
+    CachedRollupsCompanion Function({
+      required String deviceId,
+      required DateTime hour,
+      Value<double> energyWh,
+      Value<double?> avgWatts,
+      Value<int> rowid,
+    });
+typedef $$CachedRollupsTableUpdateCompanionBuilder =
+    CachedRollupsCompanion Function({
+      Value<String> deviceId,
+      Value<DateTime> hour,
+      Value<double> energyWh,
+      Value<double?> avgWatts,
+      Value<int> rowid,
+    });
+
+class $$CachedRollupsTableFilterComposer
+    extends Composer<_$AppDatabase, $CachedRollupsTable> {
+  $$CachedRollupsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get hour => $composableBuilder(
+    column: $table.hour,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get energyWh => $composableBuilder(
+    column: $table.energyWh,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get avgWatts => $composableBuilder(
+    column: $table.avgWatts,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CachedRollupsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CachedRollupsTable> {
+  $$CachedRollupsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get hour => $composableBuilder(
+    column: $table.hour,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get energyWh => $composableBuilder(
+    column: $table.energyWh,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get avgWatts => $composableBuilder(
+    column: $table.avgWatts,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CachedRollupsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CachedRollupsTable> {
+  $$CachedRollupsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get hour =>
+      $composableBuilder(column: $table.hour, builder: (column) => column);
+
+  GeneratedColumn<double> get energyWh =>
+      $composableBuilder(column: $table.energyWh, builder: (column) => column);
+
+  GeneratedColumn<double> get avgWatts =>
+      $composableBuilder(column: $table.avgWatts, builder: (column) => column);
+}
+
+class $$CachedRollupsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CachedRollupsTable,
+          CachedRollup,
+          $$CachedRollupsTableFilterComposer,
+          $$CachedRollupsTableOrderingComposer,
+          $$CachedRollupsTableAnnotationComposer,
+          $$CachedRollupsTableCreateCompanionBuilder,
+          $$CachedRollupsTableUpdateCompanionBuilder,
+          (
+            CachedRollup,
+            BaseReferences<_$AppDatabase, $CachedRollupsTable, CachedRollup>,
+          ),
+          CachedRollup,
+          PrefetchHooks Function()
+        > {
+  $$CachedRollupsTableTableManager(_$AppDatabase db, $CachedRollupsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CachedRollupsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CachedRollupsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CachedRollupsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> deviceId = const Value.absent(),
+                Value<DateTime> hour = const Value.absent(),
+                Value<double> energyWh = const Value.absent(),
+                Value<double?> avgWatts = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedRollupsCompanion(
+                deviceId: deviceId,
+                hour: hour,
+                energyWh: energyWh,
+                avgWatts: avgWatts,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String deviceId,
+                required DateTime hour,
+                Value<double> energyWh = const Value.absent(),
+                Value<double?> avgWatts = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CachedRollupsCompanion.insert(
+                deviceId: deviceId,
+                hour: hour,
+                energyWh: energyWh,
+                avgWatts: avgWatts,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CachedRollupsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CachedRollupsTable,
+      CachedRollup,
+      $$CachedRollupsTableFilterComposer,
+      $$CachedRollupsTableOrderingComposer,
+      $$CachedRollupsTableAnnotationComposer,
+      $$CachedRollupsTableCreateCompanionBuilder,
+      $$CachedRollupsTableUpdateCompanionBuilder,
+      (
+        CachedRollup,
+        BaseReferences<_$AppDatabase, $CachedRollupsTable, CachedRollup>,
+      ),
+      CachedRollup,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5536,4 +7218,8 @@ class $AppDatabaseManager {
       $$CachedRoomsTableTableManager(_db, _db.cachedRooms);
   $$CachedSiteMembersTableTableManager get cachedSiteMembers =>
       $$CachedSiteMembersTableTableManager(_db, _db.cachedSiteMembers);
+  $$CachedDevicesTableTableManager get cachedDevices =>
+      $$CachedDevicesTableTableManager(_db, _db.cachedDevices);
+  $$CachedRollupsTableTableManager get cachedRollups =>
+      $$CachedRollupsTableTableManager(_db, _db.cachedRollups);
 }

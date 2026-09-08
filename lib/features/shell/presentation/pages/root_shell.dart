@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../app/router.dart';
 import '../../../../core/extensions/context_extensions.dart';
+import '../../../../core/sync/sync_engine.dart';
 import '../../../account/presentation/bloc/site_bloc.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
+import '../../../connectivity/presentation/bloc/sync_cubit.dart';
 import '../../../connectivity/presentation/widgets/connection_status_indicator.dart';
 
 /// Bottom-nav (mobile) / nav-rail (wide) shell for the five tenant tabs.
@@ -52,7 +54,12 @@ class RootShell extends StatelessWidget {
       child: context.isExpanded
           ? _WideLayout(shell: navigationShell, onSelect: _go)
           : Scaffold(
-              body: navigationShell,
+              body: Column(
+                children: [
+                  const _SyncBanner(),
+                  Expanded(child: navigationShell),
+                ],
+              ),
               bottomNavigationBar: NavigationBar(
                 selectedIndex: navigationShell.currentIndex,
                 onDestinationSelected: _go,
@@ -101,6 +108,57 @@ class _WideLayout extends StatelessWidget {
           Expanded(child: shell),
         ],
       ),
+    );
+  }
+}
+
+/// Thin banner shown while the outbox has queued writes.
+class _SyncBanner extends StatelessWidget {
+  const _SyncBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SyncCubit, SyncViewState>(
+      builder: (context, state) {
+        if (!state.hasQueue) return const SizedBox.shrink();
+        final syncing = state.status == SyncStatus.syncing;
+        return Material(
+          color: context.colors.secondaryContainer,
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 14,
+                    width: 14,
+                    child: syncing
+                        ? const CircularProgressIndicator(strokeWidth: 2)
+                        : const Icon(Icons.cloud_upload_outlined, size: 14),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      syncing
+                          ? 'Syncing ${state.pending} change'
+                              '${state.pending == 1 ? '' : 's'}…'
+                          : '${state.pending} change'
+                              '${state.pending == 1 ? '' : 's'} waiting to sync',
+                      style: context.textTheme.labelMedium,
+                    ),
+                  ),
+                  if (!syncing)
+                    TextButton(
+                      onPressed: () => context.read<SyncCubit>().syncNow(),
+                      child: const Text('Sync now'),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

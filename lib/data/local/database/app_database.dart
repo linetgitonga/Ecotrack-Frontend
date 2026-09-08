@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 
 import 'connection.dart';
+import 'tables/device_tables.dart';
 import 'tables/identity_tables.dart';
 import 'tables/sync_tables.dart';
 
@@ -24,6 +25,9 @@ part 'app_database.g.dart';
     CachedSites,
     CachedRooms,
     CachedSiteMembers,
+    // devices
+    CachedDevices,
+    CachedRollups,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -33,13 +37,16 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) => m.createAll(),
     onUpgrade: (m, from, to) async {
-      // v1 is the initial schema. Future: stepwise `if (from < N) ...`.
+      if (from < 2) {
+        await m.createTable(cachedDevices);
+        await m.createTable(cachedRollups);
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON;');
@@ -54,6 +61,8 @@ class AppDatabase extends _$AppDatabase {
       b.deleteAll(cachedSites);
       b.deleteAll(cachedRooms);
       b.deleteAll(cachedSiteMembers);
+      b.deleteAll(cachedDevices);
+      b.deleteAll(cachedRollups);
       b.deleteAll(outbox);
       b.deleteAll(commandDedup);
       b.deleteAll(syncMeta);

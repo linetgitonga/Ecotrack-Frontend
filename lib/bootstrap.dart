@@ -6,7 +6,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'app/app.dart';
 import 'core/config/env_config.dart';
 import 'core/connectivity/connection_manager.dart';
+import 'core/sync/outbox_processor.dart';
 import 'core/sync/sync_engine.dart';
+import 'data/repositories/device_repository.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'injection/injection.dart';
 
@@ -59,6 +61,12 @@ Future<void> bootstrap(Environment environment) async {
   );
 
   await configureDependencies(config);
+
+  // Register outbox handlers before the sync engine drains anything.
+  getIt<OutboxProcessor>().register(
+    'command',
+    getIt<DeviceRepository>().handleQueuedCommand,
+  );
 
   // Start the connection state machine + sync engine (non-blocking).
   unawaited(getIt<ConnectionManager>().start());

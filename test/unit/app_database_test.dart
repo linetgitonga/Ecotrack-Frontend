@@ -14,8 +14,8 @@ void main() {
 
   tearDown(() => db.close());
 
-  test('schema creates and opens (schemaVersion 1)', () async {
-    expect(db.schemaVersion, 1);
+  test('schema creates and opens', () async {
+    expect(db.schemaVersion, 2);
     // A trivial query proves every table was created.
     expect(await db.select(db.cachedSites).get(), isEmpty);
   });
